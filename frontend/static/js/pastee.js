@@ -12,12 +12,14 @@ $(function() {
 // Hook for clicking paste button.
 $('#pb').click(function() {
   var content = $('#_content').val();
+  var lexer = $('#_lexer').val();
   var ttl = $('#_ttl').val();
   var encrypt = $('#_encrypt').val();
   var key = $('#_key').val();
 
   var post_data = {
     content: content,
+    lexer: lexer,
     ttl: ttl,
     encrypted: (encrypt == 'yes') ? true : false
   };

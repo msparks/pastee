@@ -6,6 +6,7 @@ import time
 from django import http
 
 import datastore
+import formatting
 import idmgr
 
 JSON_CONTENT_TYPE = 'application/json'
@@ -19,6 +20,7 @@ def error_response(err_msg, status=403):
                            status=status,
                            content_type=JSON_CONTENT_TYPE)
 
+
 def index(request):
   return http.HttpResponse('.')
 
@@ -28,18 +30,29 @@ def get(request, id, raw=None):
   if len(id) > 100:
     return error_response('Invalid ID', status=404)
 
+  # Look up metadata.
+  # TODO(ms): Handle expired posts.
   md_key = 'paste:metadata:%s' % id
   md_json = datastore.get(md_key)
   if md_json is None:
     return error_response('Invalid ID', status=404)
   md = json.loads(md_json)
 
+  # Decode content.
   content_key = 'paste:content:%s' % id
-  content = datastore.get(content_key)
-  if content is None:
+  b64_content = datastore.get(content_key)
+  if b64_content is None:
     return error_response('Expired', status=403)
+  content = base64.b64decode(b64_content)
 
-  return http.HttpResponse(base64.b64decode(content))
+  if not raw:
+    # HTML-ized output.
+    lexer = formatting.validate_lexer_name(md.get('lexer', 'text'))
+    html = formatting.htmlize(content, lexer)
+    return http.HttpResponse(html, content_type='text/html')
+  else:
+    # Plain text output.
+    return http.HttpResponse(content, content_type='text/plain')
 
 
 def submit(request):

@@ -36,7 +36,7 @@
       <textarea class="pastearea" id="_content" rows="25"></textarea>
 
       <div class="span-9 options">
-        <select name="lexer" class="lexers">
+        <select name="lexer" class="lexers" id="_lexer">
           <option disabled="disabled" class="hd">Common lexers</option>
           <option value="c">C</option>
           <option value="csharp">C#</option>
@@ -169,7 +169,8 @@
 
     <div class="span-18 pl">
       <div class="span-9 security">
-        <input type="checkbox" id="_encrypt" value="yes" /> encrypt
+        <input type="checkbox" id="_encrypt" value="yes" />
+        <label for="_encrypt">encrypt</label>
       </div>
 
       <div class="first last pastebutton">
@@ -179,7 +180,7 @@
   </div>
 
   <div class="push-3 span-18 hide" id="viewpaste">
-    foo
+    Loading...
   </div>
 
   <div class="push-3 span-18" id="footer">
