@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Pastee</title>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+
+  <link rel="stylesheet" href="/static/blueprint/screen.css" type="text/css" media="screen, projection">
+  <link rel="stylesheet" href="/static/blueprint/print.css" type="text/css" media="print">
+  <!--[if lt IE 8]><link rel="stylesheet" href="../../blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+
+  <link type="text/css" rel="stylesheet" href="/static/css/buttons.css" />
+  <link type="text/css" rel="stylesheet" href="/static/css/style.css" />
+  <link type="text/css" rel="stylesheet" href="/static/css/pygments_style.css" />
+
+  <script type="text/javascript" src="/static/js/jquery.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="push-3 span-18" id="header">
+    <div id="navigation">
+      <ul>
+        <li><a href="/">home</a></li>
+        <li><a href="/api">API</a></li>
+        <li><a href="/statistics">statistics</a></li>
+        <li><a href="/about">about</a></li>
+      </ul>
+    </div>
+
+    <h1><a href="/">pastee.</a></h1>
+    <h2>the secure pastebin</h2>
+  </div>
+
+  <div class="push-3 span-18 hide" id="newpaste">
+    <div class="pastebox">
+      <textarea class="pastearea" id="_content" rows="25"></textarea>
+
+      <div class="span-9 options">
+        <select name="lexer" class="lexers">
+          <option disabled="disabled" class="hd">Common lexers</option>
+          <option value="c">C</option>
+          <option value="csharp">C#</option>
+          <option value="cpp">C++</option>
+          <option value="css">CSS</option>
+          <option value="diff">Diff</option>
+          <option value="html">HTML</option>
+          <option value="java">Java</option>
+          <option value="js">JavaScript</option>
+          <option value="objective-c">Objective-C</option>
+          <option value="php">PHP</option>
+          <option value="perl">Perl</option>
+          <option value="python">Python</option>
+          <option value="rb">Ruby</option>
+          <option value="sql">SQL</option>
+          <option value="tex">TeX</option>
+          <option value="text" selected="selected">Text only</option>
+          <option value="xml">XML</option>
+
+          <option disabled="disabled" class="hd">Other lexers</option>
+          <option value="as">ActionScript</option>
+          <option value="apacheconf">ApacheConf</option>
+          <option value="bbcode">BBCode</option>
+          <option value="bash">Bash</option>
+          <option value="bat">Batchfile</option>
+          <option value="befunge">Befunge</option>
+          <option value="boo">Boo</option>
+          <option value="brainfuck">Brainfuck</option>
+          <option value="common-lisp">Common Lisp</option>
+          <option value="d">D</option>
+          <option value="dpatch">Darcs Patch</option>
+          <option value="control">Debian Control file</option>
+          <option value="sourceslist">Debian Sourcelist</option>
+          <option value="delphi">Delphi</option>
+          <option value="django">Django/Jinja</option>
+          <option value="dylan">Dylan</option>
+          <option value="erb">ERB</option>
+          <option value="erlang">Erlang</option>
+          <option value="fortran">Fortran</option>
+          <option value="gas">GAS</option>
+          <option value="genshi">Genshi</option>
+          <option value="genshitext">Genshi Text</option>
+          <option value="pot">Gettext Catalog</option>
+          <option value="groff">Groff</option>
+          <option value="haskell">Haskell</option>
+          <option value="ini">INI</option>
+          <option value="irc">IRC logs</option>
+          <option value="io">Io</option>
+          <option value="jsp">Java Server Page</option>
+          <option value="llvm">LLVM</option>
+          <option value="lhs">Literate Haskell</option>
+          <option value="logtalk">Logtalk</option>
+          <option value="lua">Lua</option>
+          <option value="moocode">MOOCode</option>
+          <option value="basemake">Makefile</option>
+          <option value="mako">Mako</option>
+          <option value="matlab">Matlab</option>
+          <option value="matlabsession">Matlab session</option>
+          <option value="minid">MiniD</option>
+          <option value="trac-wiki">MoinMoin/Trac Wiki markup</option>
+          <option value="mupad">MuPAD</option>
+          <option value="mysql">MySQL</option>
+          <option value="myghty">Myghty</option>
+          <option value="numpy">NumPy</option>
+          <option value="ocaml">OCaml</option>
+          <option value="python3">Python 3</option>
+          <option value="pytb">Python Traceback</option>
+          <option value="pycon">Python console session</option>
+          <option value="rhtml">RHTML</option>
+          <option value="raw">Raw token data</option>
+          <option value="redcode">Redcode</option>
+          <option value="rbcon">Ruby irb session</option>
+          <option value="splus">S</option>
+          <option value="scheme">Scheme</option>
+          <option value="smalltalk">Smalltalk</option>
+          <option value="smarty">Smarty</option>
+          <option value="squidconf">SquidConf</option>
+          <option value="tcl">Tcl</option>
+          <option value="tcsh">Tcsh</option>
+          <option value="vb.net">VB.net</option>
+          <option value="vim">VimL</option>
+          <option value="xslt">XSLT</option>
+          <option value="c-objdump">c-objdump</option>
+          <option value="cpp-objdump">cpp-objdump</option>
+          <option value="d-objdump">d-objdump</option>
+          <option value="objdump">objdump</option>
+          <option value="rst">reStructuredText</option>
+
+          <option disabled="disabled" class="hd">Combo lexers</options>
+          <option value="css+django">CSS+Django/Jinja</option>
+          <option value="css+genshitext">CSS+Genshi Text</option>
+          <option value="css+mako">CSS+Mako</option>
+          <option value="css+myghty">CSS+Myghty</option>
+          <option value="css+php">CSS+PHP</option>
+          <option value="css+erb">CSS+Ruby</option>
+          <option value="css+smarty">CSS+Smarty</option>
+          <option value="html+django">HTML+Django/Jinja</option>
+          <option value="html+genshi">HTML+Genshi</option>
+          <option value="html+mako">HTML+Mako</option>
+          <option value="html+myghty">HTML+Myghty</option>
+          <option value="html+php">HTML+PHP</option>
+          <option value="html+smarty">HTML+Smarty</option>
+          <option value="js+django">JavaScript+Django/Jinja</option>
+          <option value="js+genshitext">JavaScript+Genshi Text</option>
+          <option value="js+mako">JavaScript+Mako</option>
+          <option value="js+myghty">JavaScript+Myghty</option>
+          <option value="js+php">JavaScript+PHP</option>
+          <option value="js+erb">JavaScript+Ruby</option>
+          <option value="js+smarty">JavaScript+Smarty</option>
+          <option value="xml+django">XML+Django/Jinja</option>
+          <option value="xml+mako">XML+Mako</option>
+          <option value="xml+myghty">XML+Myghty</option>
+          <option value="xml+php">XML+PHP</option>
+          <option value="xml+erb">XML+Ruby</option>
+          <option value="xml+smarty">XML+Smarty</option>
+        </select>
+      </div>
+
+      <div class="first last options ttl">
+        <acronym title="Time to Live">TTL</acronym>
+        <select id="_ttl">
+          <option value="3600">an hour</option>
+          <option value="86400">a day</option>
+          <option value="604800">a week</option>
+          <option value="2592000" selected="selected">a month</option>
+          <option value="31536000">a year</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="span-18 pl">
+      <div class="span-9 security">
+        <input type="checkbox" id="_encrypt" value="yes" /> encrypt
+      </div>
+
+      <div class="first last pastebutton">
+       <button type="submit" id="pb" class="skip">Paste</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="push-3 span-18 hide" id="viewpaste">
+    foo
+  </div>
+
+  <div class="push-3 span-18" id="footer">
+    &copy;
+    <script type="text/javascript">
+    var d = new Date();
+    document.write(d.getFullYear());
+    </script>
+    Pastee.
+  </div>
+</div>
+<script type="text/javascript" src="/static/js/pastee.js"></script>
+</body>
+</html>

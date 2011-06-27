@@ -1,0 +1,169 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 20px;
+}
+
+.syntaxtable {
+  width: 100%;
+}
+
+#paste {
+  background-color: #eee;
+  padding-left: 10px;
+  min-height: 150px;
+}
+
+.code {
+}
+
+.lexers .hd {
+  background-color: #FFBA27;
+  color: black;
+  padding-left: 0;
+}
+
+.lexers option {
+  padding-left: 1em;
+}
+
+div#content a {
+  color: #FFBA27;
+  font-weight: bold;
+  text-decoration: none;
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #F1F1F1;
+  border-right: 1px solid #F1F1F1;
+  padding: 1px;
+}
+
+div#content a:hover {
+  color: #FFBA27;
+  font-weight: bold;
+  text-decoration: none;
+  background-color: #FAFAFA;
+  border-bottom: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+  padding: 1px;
+}
+
+div#header {
+  padding-bottom: 5px;
+  border-bottom: 1px solid #EEE;
+}
+
+h1 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  font-weight: normal;
+  color: #0c5aa6;
+  letter-spacing: -1px;
+}
+h1 a {
+  color: #04396c;
+  text-decoration: none;
+}
+
+h2 { /* The tagline thing */
+  font-size: 11px;
+  font-weight: normal;
+  color: #999;
+  padding-left: 20px;
+  margin-top: -10px;
+}
+
+#navigation {
+  font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+  float: right;
+  margin-top: 10px;
+}
+
+#navigation li {
+  display: inline;
+  padding-right: 20px;
+  font-size: 11px;
+}
+
+#navigation li a {
+  font-size: 11px;
+  color: #666;
+  font-weight: normal;
+  padding: 4px;
+  text-decoration: none;
+}
+
+#navigation li a:hover {
+  text-decoration: underline;
+}
+
+div .pastebox {
+  padding: 10px;
+  background-color: #408ad2;
+  border-radius: 7px;
+}
+
+.pastearea {
+  margin: 0;
+  padding: 5px;
+  width: 680px;
+  border-radius: 7px;
+  border: 2px solid #679ed2;
+}
+
+div .options {
+  padding-top: 5px;
+  font-size: 15px;
+}
+
+div .ttl {
+  color: #eee;
+  text-align: right;
+}
+
+div .pl {
+  margin-top: 10px;
+}
+
+div .security {
+  font-size: 20px;
+  color: #333;
+  border-radius: 7px;
+  margin-left: 10px;
+}
+
+div .security input {
+  background-color: blue;
+}
+
+div.pastebutton {
+  margin-right: 10px;
+  text-align: right;
+}
+
+select {
+  font-size: 18px;
+}
+
+div#footer p {
+  padding: 5px 10px;
+}
+
+div#footer {
+  text-align: center;
+  color: #bbb;
+  font-size: 11px;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 5px;
+}
+
+div#footer a,
+div#footer a:hover {
+  background-color: #333;
+  color: #FFF;
+  font-size: 11px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #FFBA27;
+  font-weight: bold;
+  text-decoration: none;
+  border-bottom: 1px solid #333;
+  border-right: 1px solid #333;
+}
