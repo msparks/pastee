@@ -4,7 +4,7 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('backend.pastee.views',
   (r'^$', 'index'),
   (r'^submit$', 'submit'),
-  (r'^get/(?P<id>[a-zA-Z0-9]+)$', 'get'),
+  (r'^get/(?P<id>[a-zA-Z0-9]+)(?P<raw>/raw)?$', 'get'),
 
   (r'^api$', 'api'),
   (r'^statistics$', 'statistics'),

@@ -1,10 +1,10 @@
+import base64
 import json
 import pprint
 import time
 
 from django import http
 
-import base64
 import datastore
 import idmgr
 
@@ -23,7 +23,8 @@ def index(request):
   return http.HttpResponse('.')
 
 
-def get(request, id):
+def get(request, id, raw=None):
+  raw = (raw is not None)  # convert raw to boolean
   if len(id) > 100:
     return error_response('Invalid ID', status=404)
 
