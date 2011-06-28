@@ -4,74 +4,17 @@ body {
   background-color: #eee;
 }
 
-#viewpaste {
-  background-color: #ddd;
-  min-height: 150px;
-  border-radius: 7px;
-}
 
-.viewpastebox {
-  margin: 10px;
-  overflow: auto;
-}
-
-.syntaxtable {
-  width: 100%;
-}
-
-.syntaxtable pre {
-  margin: 0;
-}
-
-.syntaxtable td {
-  margin: 0;
-  padding: 0;
-}
-
-.syntaxtable .linenos {
-  padding-right: 10px;
-  width: 24px;
-  color: #999;
-}
-
-.code {
-}
-
-.lexers .hd {
-  background-color: #FFBA27;
-  color: black;
-  padding-left: 0;
-}
-
-.lexers option {
-  padding-left: 1em;
-}
-
-div#content a {
-  color: #FFBA27;
-  font-weight: bold;
-  text-decoration: none;
-  background-color: #FAFAFA;
-  border-bottom: 1px solid #F1F1F1;
-  border-right: 1px solid #F1F1F1;
-  padding: 1px;
-}
-
-div#content a:hover {
-  color: #FFBA27;
-  font-weight: bold;
-  text-decoration: none;
-  background-color: #FAFAFA;
-  border-bottom: 1px solid #CCC;
-  border-right: 1px solid #CCC;
-  padding: 1px;
-}
+/**
+ * Page header style.
+ */
 
 div#header {
   padding-bottom: 5px;
   border-bottom: 1px solid #ddd;
 }
 
+/* Title headers. */
 h1 {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 25px;
@@ -91,6 +34,11 @@ h2 { /* The tagline thing */
   padding-left: 20px;
   margin-top: -10px;
 }
+
+
+/**
+ * Page navigation links.
+ */
 
 #navigation {
   font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
@@ -116,8 +64,10 @@ h2 { /* The tagline thing */
   text-decoration: underline;
 }
 
-div .pastebox {
-}
+
+/**
+ * Style for the paste textarea and surrounding elements.
+ */
 
 .pastearea {
   margin: 5px;
@@ -175,22 +125,36 @@ div .pastebox {
   transform: skew(9deg) rotate(4deg);
 }
 
-
+/* Lexer and TTL divs. */
 div .options {
   font-size: 15px;
   padding-left: 10px;
 }
 
+/* Options in lexer dropdown. */
+.lexers option {
+  padding-left: 1em;
+}
+
+/* Header in lexer dropdown. */
+.lexers .hd {
+  color: #666;
+  padding-left: 0;
+}
+
+/* TTL div. */
 div .ttl {
   color: #666;
   text-align: right;
   padding-right: 10px;
 }
 
+/* Div below the paste box. */
 div .pl {
   margin-top: 10px;
 }
 
+/* Security options. */
 div .security {
   font-size: 20px;
   color: #333;
@@ -202,6 +166,7 @@ div .security input {
   background-color: blue;
 }
 
+/* Clickable paste button to submit a paste. */
 div.pastebutton {
   float: right;
   margin-right: 30px;
@@ -223,9 +188,45 @@ div.pastebutton:hover {
   transition: opacity ease-in 200ms;
 }
 
-select {
 
+/**
+ * Style used when viewing a paste.
+ */
+
+#viewpaste {
+  background-color: #ddd;
+  min-height: 150px;
+  border-radius: 7px;
 }
+
+.viewpastebox {
+  margin: 10px;
+  overflow: auto;
+}
+
+.syntaxtable {
+  width: 100%;
+}
+
+.syntaxtable pre {
+  margin: 0;
+}
+
+.syntaxtable td {
+  margin: 0;
+  padding: 0;
+}
+
+.syntaxtable .linenos {
+  padding-right: 10px;
+  width: 24px;
+  color: #999;
+}
+
+
+/**
+ * Footer style.
+ */
 
 div#footer p {
   padding: 5px 10px;
