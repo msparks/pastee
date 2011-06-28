@@ -9,7 +9,20 @@ $(function() {
 });
 
 
-// Hook for clicking paste button.
+// Shows message banner with given content.
+function displayBanner(html) {
+  $('.banner').html(html);
+  $('.banner').slideDown();
+  setTimeout("hideBanner()", 3000);
+}
+
+// Hides the message banner.
+function hideBanner() {
+  $('.banner').slideUp();
+}
+
+
+// Called when the paste button is clicked.
 function pasteClick() {
   var content = $('#_content').val();
   var lexer = $('#_lexer').val();
@@ -43,7 +56,12 @@ function pasteSuccess(data, text_status, jq_xhr) {
 
 
 function pasteError(jq_xhr, text_status, error) {
-  alert(text_status + ": " + error);
+  if (jq_xhr.status == 403) {
+    var error_obj = $.parseJSON(jq_xhr.responseText);
+    displayBanner(error_obj['error']);
+  } else {
+    displayBanner('Error ' + jq_xhr.status + '. Try again later.');
+  }
 }
 
 
@@ -66,5 +84,16 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
 
 
 function loadPasteError(jq_xhr, text_status, error) {
+  if (jq_xhr.status == 404) {
+    var id = window.location.pathname.substr(1);
+    displayBanner('Paste ID \'' + id + '\' does not exist');
+  } else if (jq_xhr.status == 403) {
+    var error_obj = $.parseJSON(jq_xhr.responseText);
+    displayBanner(error_obj['error']);
+  } else {
+    displayBanner('Error ' + jq_xhr.status + '. Try again later.');
+  }
 
+  $('#viewpaste').hide();
+  $('#newpaste').show();
 }

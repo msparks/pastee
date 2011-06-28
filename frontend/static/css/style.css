@@ -66,6 +66,25 @@ h2 { /* The tagline thing */
 
 
 /**
+ * Message banner overlay.
+ */
+div.banner {
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #000;
+  color: #ddd;
+  opacity: 0.8;
+  margin: 0;
+  width: 100%;
+  padding: 15px 0 15px 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+
+/**
  * Style for the paste textarea and surrounding elements.
  */
 
