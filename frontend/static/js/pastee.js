@@ -54,7 +54,7 @@ function loadPaste(id) {
     type: 'GET',
     url: '/api/get/' + id,
     success: function(data) {
-      $('#viewpaste').html(data);
+      $('.viewpastebox').html(data);
     }
   });
 }

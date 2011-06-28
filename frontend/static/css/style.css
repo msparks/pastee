@@ -7,11 +7,19 @@ body {
   background-color: #eee;
   min-height: 150px;
   border-radius: 7px;
+}
+
+.viewpastebox {
+  margin: 10px;
   overflow: auto;
 }
 
 .syntaxtable {
   width: 100%;
+}
+
+.syntaxtable pre {
+  margin: 0;
 }
 
 .syntaxtable td {
@@ -20,7 +28,6 @@ body {
 }
 
 .syntaxtable .linenos {
-  padding-left: 10px;
   padding-right: 10px;
   width: 24px;
   color: #999;
