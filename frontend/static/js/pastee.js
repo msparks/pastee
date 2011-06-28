@@ -48,6 +48,21 @@ function pasteClick() {
 $('#pb').click(pasteClick);
 
 
+// Called when the paste textarea gets focus.
+function pasteAreaFocus() {
+  $(this).css('background-image', 'none');
+}
+$('.pastearea').focus(pasteAreaFocus);
+
+
+// Called when the paste textarea loses focus.
+function pasteAreaBlur() {
+  if ($('#_content').val() == '')
+    $(this).css('background-image', 'url(/static/img/pastehere.png)');
+}
+$('.pastearea').blur(pasteAreaBlur);
+
+
 function pasteSuccess(data, text_status, jq_xhr) {
   // Update address bar with URL of paste.
   if (window.history && history.pushState) {

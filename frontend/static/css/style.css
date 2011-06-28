@@ -93,7 +93,10 @@ div.banner {
   padding: 5px;
   width: 640px;
   height: 348px;
-  background: transparent;
+  background-image: url('../img/pastehere.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
   border: none;
   resize: none;
   color: #888;
