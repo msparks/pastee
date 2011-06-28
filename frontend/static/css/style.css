@@ -1,10 +1,11 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   margin-top: 20px;
+  background-color: #eee;
 }
 
 #viewpaste {
-  background-color: #eee;
+  background-color: #ddd;
   min-height: 150px;
   border-radius: 7px;
 }
@@ -68,7 +69,7 @@ div#content a:hover {
 
 div#header {
   padding-bottom: 5px;
-  border-bottom: 1px solid #EEE;
+  border-bottom: 1px solid #ddd;
 }
 
 h1 {
@@ -116,27 +117,74 @@ h2 { /* The tagline thing */
 }
 
 div .pastebox {
-  padding: 10px;
-  background-color: #408ad2;
-  border-radius: 7px;
 }
 
 .pastearea {
-  margin: 0;
+  margin: 5px;
   padding: 5px;
-  width: 680px;
-  border-radius: 7px;
-  border: 2px solid #679ed2;
+  width: 640px;
+  height: 348px;
+  background: transparent;
+  border: none;
+  resize: none;
+  color: #888;
+  font-size: 16px;
 }
 
+.pastebox {
+  position: relative;
+  float: left;
+  width: 665px;
+  height: 400px;
+  padding: 0;
+  border: 1px solid #efefef;
+  margin: 0px 0px 20px 20px;
+  background: #fff;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
+}
+
+.pastebox:before,
+.pastebox:after {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 70%;
+  max-width: 300px; /* avoid rotation causing ugly appearance at large container widths */
+  height: 55%;
+  -webkit-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  -webkit-transform: skew(-9deg) rotate(-4deg);
+  -moz-transform: skew(-9deg) rotate(-4deg);
+  -ms-transform: skew(-9deg) rotate(-4deg);
+  -o-transform: skew(-9deg) rotate(-4deg);
+  transform: skew(-9deg) rotate(-4deg);
+}
+
+.pastebox:after {
+  left: auto;
+  right: 10px;
+  -webkit-transform: skew(9deg) rotate(4deg);
+  -moz-transform: skew(9deg) rotate(4deg);
+  -ms-transform: skew(9deg) rotate(4deg);
+  -o-transform: skew(9deg) rotate(4deg);
+  transform: skew(9deg) rotate(4deg);
+}
+
+
 div .options {
-  padding-top: 5px;
   font-size: 15px;
+  padding-left: 10px;
 }
 
 div .ttl {
-  color: #eee;
+  color: #666;
   text-align: right;
+  padding-right: 10px;
 }
 
 div .pl {
@@ -147,7 +195,7 @@ div .security {
   font-size: 20px;
   color: #333;
   border-radius: 7px;
-  margin-left: 10px;
+  margin-left: 30px;
 }
 
 div .security input {
@@ -155,7 +203,7 @@ div .security input {
 }
 
 div.pastebutton {
-  margin-right: 10px;
+  margin-right: 30px;
   text-align: right;
 }
 
