@@ -1,7 +1,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   margin-top: 20px;
-  background-color: #eee;
+  background-color: #fafafa;
 }
 
 
@@ -89,7 +89,7 @@ h2 { /* The tagline thing */
   padding: 0;
   border: 1px solid #efefef;
   margin: 0px 0px 20px 20px;
-  background: #fff;
+  background: #fafafa;
   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
   -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
@@ -193,10 +193,14 @@ div.pastebutton:hover {
  * Style used when viewing a paste.
  */
 
-#viewpaste {
-  background-color: #ddd;
+.viewcontainer {
+  margin: 0 auto;
   min-height: 150px;
-  border-radius: 7px;
+  padding: 1px 0 5px 0;
+  width: 669px;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
 }
 
 .viewpastebox {
@@ -206,6 +210,7 @@ div.pastebutton:hover {
 
 .syntaxtable {
   width: 100%;
+  background-color: inherit;
 }
 
 .syntaxtable pre {
@@ -219,8 +224,13 @@ div.pastebutton:hover {
 
 .syntaxtable .linenos {
   padding-right: 10px;
+  text-align: right;
   width: 24px;
   color: #999;
+}
+
+.syntax {
+  background-color: transparent;
 }
 
 
