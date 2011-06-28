@@ -208,6 +208,11 @@ div.pastebutton:hover {
   overflow: auto;
 }
 
+.viewpastebox img {
+  display: block;
+  margin: 0 auto;
+}
+
 .syntaxtable {
   width: 100%;
   background-color: inherit;
