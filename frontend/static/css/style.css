@@ -203,8 +203,24 @@ div .security input {
 }
 
 div.pastebutton {
+  float: right;
   margin-right: 30px;
   text-align: right;
+  opacity: 0.5;
+  -webkit-transition: opacity ease-out 200ms;
+  -moz-transition: opacity ease-out 200ms;
+  -ms-transition: opacity ease-out 200ms;
+  -o-transition: opacity ease-out 200ms;
+  transition: opacity ease-out 200ms;
+}
+
+div.pastebutton:hover {
+  opacity: .9;
+  -webkit-transition: opacity ease-in 200ms;
+  -moz-transition: opacity ease-in 200ms;
+  -ms-transition: opacity ease-in 200ms;
+  -o-transition: opacity ease-in 200ms;
+  transition: opacity ease-in 200ms;
 }
 
 select {
