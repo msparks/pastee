@@ -54,8 +54,17 @@ function loadPaste(id) {
   $.ajax({
     type: 'GET',
     url: '/api/get/' + id,
-    success: function(data) {
-      $('.viewpastebox').html(data);
-    }
+    success: loadPasteSuccess,
+    error: loadPasteError
   });
+}
+
+
+function loadPasteSuccess(data, text_status, jq_xhr) {
+  $('.viewpastebox').html(data);
+}
+
+
+function loadPasteError(jq_xhr, text_status, error) {
+
 }
