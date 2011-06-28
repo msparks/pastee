@@ -181,10 +181,6 @@ div .security {
   margin-left: 30px;
 }
 
-div .security input {
-  background-color: blue;
-}
-
 /* Clickable paste button to submit a paste. */
 div.pastebutton {
   float: right;
