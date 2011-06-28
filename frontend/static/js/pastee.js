@@ -10,7 +10,7 @@ $(function() {
 
 
 // Hook for clicking paste button.
-$('#pb').click(function() {
+function pasteClick() {
   var content = $('#_content').val();
   var lexer = $('#_lexer').val();
   var ttl = $('#_ttl').val();
@@ -31,7 +31,8 @@ $('#pb').click(function() {
     success: pasteSuccess,
     error: pasteError
   });
-});
+}
+$('#pb').click(pasteClick);
 
 
 function pasteSuccess(data, text_status, jq_xhr) {
