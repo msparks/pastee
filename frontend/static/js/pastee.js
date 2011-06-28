@@ -50,8 +50,13 @@ $('#pb').click(pasteClick);
 
 function pasteSuccess(data, text_status, jq_xhr) {
   // Update address bar with URL of paste.
-  history.pushState(null, null, data['id']);
-  loadPaste(data['id']);
+  if (window.history && history.pushState) {
+    history.pushState(null, null, data['id']);
+    loadPaste(data['id']);
+  } else {
+    // Brower does not support history.pushState.
+    window.location.pathname = '/' + data['id'];
+  }
 }
 
 
