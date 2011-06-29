@@ -101,6 +101,8 @@ function pasteError(jq_xhr, text_status, error) {
 function loadPaste(id) {
   $('#newpaste').hide();
   $('#viewpaste').show();
+  $('.viewinfo').hide();
+  $('.viewmodes').hide();
 
   // Request paste metadata and content.
   $.ajax({
@@ -129,6 +131,7 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   $('.viewinfo').html('Paste ID <tt>' + link_html + '</tt> (' +
                       data.lexer + ', TTL: ' + ttl_days + ' days)');
   $('.viewinfo').show();
+  $('.viewmodes').show();
 
   // Show paste content.
   displayPaste(_active_paste);
