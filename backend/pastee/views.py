@@ -24,8 +24,9 @@ def index(request):
   return http.HttpResponse('.')
 
 
-def get(request, id, raw=None):
-  raw = (raw is not None)  # convert raw to boolean
+def get(request, id, mode=None):
+  raw = (mode == '/raw')
+  download = (mode == '/download')
   if len(id) > 100:
     return error_response('Invalid ID', status=404)
 
@@ -43,7 +44,18 @@ def get(request, id, raw=None):
   if content is None:
     return error_response('Expired', status=403)
 
-  if not raw:
+  if raw:
+    # Plain text output.
+    return http.HttpResponse(content, content_type='text/plain')
+  elif download:
+    # Download.
+    # TODO(ms): Some lexer aliases are not the conventional file extensions.
+    filename = 'pastee-%s.%s' % (id, md['lexer'])
+    response = http.HttpResponse(content,
+                                 content_type='application/octet-stream')
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+  else:
     # HTML-ized output.
     lexer = formatting.validate_lexer_name(md.get('lexer', 'text'))
     html = formatting.htmlize(content, lexer)
@@ -55,9 +67,6 @@ def get(request, id, raw=None):
             'html': html,
             'raw': content}
     return http.HttpResponse(json.dumps(data), content_type=JSON_CONTENT_TYPE)
-  else:
-    # Plain text output.
-    return http.HttpResponse(content, content_type='text/plain')
 
 
 def metadata(request, id):
