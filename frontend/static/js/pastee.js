@@ -6,6 +6,8 @@ $(function() {
   } else {
     $('#newpaste').show();
   }
+
+  noWrapMode();
 });
 
 
@@ -149,4 +151,22 @@ function loadPasteContentSuccess(data, text_status, jq_xhr) {
 function loadPasteContentError(jq_xhr, text_status, error) {
   $('#viewpaste').hide();
   $('#newpaste').show();
+}
+
+
+// Turns on word-wrapping for the paste.
+function wrapMode() {
+  $('.linenos').hide();
+  $('.syntax pre').addClass('wrapped');
+  $('.wrap').addClass('selected');
+  $('.wrap').click(noWrapMode);
+}
+
+
+// Disables word-wrapping mode for the paste.
+function noWrapMode() {
+  $('.linenos').show();
+  $('.syntax pre').removeClass('wrapped');
+  $('.wrap').removeClass('selected');
+  $('.wrap').click(wrapMode);
 }
