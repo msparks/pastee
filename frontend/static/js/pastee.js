@@ -101,25 +101,20 @@ function loadPaste(id) {
   $('#newpaste').hide();
   $('#viewpaste').show();
 
-  // Request paste metadata.
-  $.ajax({
-    type: 'GET',
-    url: '/api/metadata/' + id,
-    success: loadPasteMetadataSuccess,
-    error: loadPasteMetadataError
-  });
-
-  // Request paste content.
+  // Request paste metadata and content.
   $.ajax({
     type: 'GET',
     url: '/api/get/' + id,
-    success: loadPasteContentSuccess,
-    error: loadPasteContentError
+    success: loadPasteSuccess,
+    error: loadPasteError
   });
 }
 
 
-function loadPasteMetadataSuccess(data, text_status, jq_xhr) {
+function loadPasteSuccess(data, text_status, jq_xhr) {
+  // Save paste data to enable reverting.
+  _active_paste = data;
+
   // Calculate TTL in days.
   var d = new Date();
   var epoch = d.getTime() / 1000;              // epoch in seconds
@@ -128,14 +123,18 @@ function loadPasteMetadataSuccess(data, text_status, jq_xhr) {
   var ttl_days = ttl / 86400;                  // ttl in days
   ttl_days = Math.round(ttl_days * 100) / 100;
 
+  // Show paste info bar.
   var link_html = '<a href="/' + data['id'] + '">' + data['id'] + '</a>';
   $('.viewinfo').html('Paste ID <tt>' + link_html + '</tt> (' +
                       data['lexer'] + ', TTL: ' + ttl_days + ' days)');
   $('.viewinfo').show();
+
+  // Show paste content.
+  $('.viewpastebox').html(data['html']);
 }
 
 
-function loadPasteMetadataError(jq_xhr, text_status, error) {
+function loadPasteError(jq_xhr, text_status, error) {
   if (jq_xhr.status == 404) {
     var id = window.location.pathname.substr(1);
     displayBanner('Paste ID \'' + id + '\' does not exist');
@@ -145,18 +144,8 @@ function loadPasteMetadataError(jq_xhr, text_status, error) {
   } else {
     displayBanner('Error ' + jq_xhr.status + '. Try again later.');
   }
-}
 
-
-// Called on successful download of paste content.
-function loadPasteContentSuccess(data, text_status, jq_xhr) {
-  _active_paste = data;
-  $('.viewpastebox').html(data['html']);
-}
-
-
-// Called on error downloading paste content.
-function loadPasteContentError(jq_xhr, text_status, error) {
+  // Show new paste box.
   $('#viewpaste').hide();
   $('#newpaste').show();
 }
