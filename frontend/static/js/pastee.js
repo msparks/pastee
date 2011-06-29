@@ -1,3 +1,5 @@
+var _active_paste;
+
 // Initialization.
 $(function() {
   var pathname = window.location.pathname;
@@ -7,7 +9,10 @@ $(function() {
     $('#newpaste').show();
   }
 
+  _active_paste = { };
+
   noWrapMode();
+  noLinkifyMode();
 });
 
 
@@ -143,6 +148,7 @@ function loadPasteMetadataError(jq_xhr, text_status, error) {
 
 // Called on successful download of paste content.
 function loadPasteContentSuccess(data, text_status, jq_xhr) {
+  _active_paste['content'] = data;
   $('.viewpastebox').html(data);
 }
 
@@ -169,4 +175,22 @@ function noWrapMode() {
   $('.syntax pre').removeClass('wrapped');
   $('.wrap').removeClass('selected');
   $('.wrap').click(wrapMode);
+}
+
+
+// Turns on linkify mode (adds hyperlinks).
+function linkifyMode() {
+  $('.linkify').addClass('selected');
+  $('.viewpastebox').html(linkify(_active_paste['content']));
+  $('.linkify').unbind('click');
+  $('.linkify').click(noLinkifyMode);
+}
+
+
+// Turns off linkify mode.
+function noLinkifyMode() {
+  $('.linkify').removeClass('selected');
+  $('.viewpastebox').html(_active_paste['content']);
+  $('.linkify').unbind('click');
+  $('.linkify').click(linkifyMode);
 }

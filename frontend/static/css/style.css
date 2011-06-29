@@ -226,12 +226,23 @@ div.pastebutton:hover {
   height: 16px;
   margin: 10px 10px 0 0;
   float: right;
-  clear: both;
   background-image: url('../img/wrap-bw.png');
 }
 
 .viewcontainer .wrap.selected {
   background-image: url('../img/wrap.png');
+}
+
+.viewcontainer .linkify {
+  width: 16px;
+  height: 16px;
+  margin: 10px 10px 0 0;
+  float: right;
+  background-image: url('../img/link-bw.png');
+}
+
+.viewcontainer .linkify.selected {
+  background-image: url('../img/link.png');
 }
 
 .viewinfo {
