@@ -44,6 +44,7 @@ def htmlize(text, lexer_name=None):
   if lexer_name is None:
     lexer_name = 'text'
   lexer = pygments.lexers.get_lexer_by_name(lexer_name, stripall=True)
+  lexer.encoding = 'utf-8'
   formatter = pygments.formatters.HtmlFormatter(linenos=True, cssclass='syntax')
   html = pygments.highlight(text, lexer, formatter)
   return html

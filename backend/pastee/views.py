@@ -1,4 +1,3 @@
-import base64
 import json
 import pprint
 import time
@@ -40,10 +39,9 @@ def get(request, id, raw=None):
 
   # Decode content.
   content_key = 'paste:content:%s' % id
-  b64_content = datastore.get(content_key)
-  if b64_content is None:
+  content = datastore.get(content_key)
+  if content is None:
     return error_response('Expired', status=403)
-  content = base64.b64decode(b64_content)
 
   if not raw:
     # HTML-ized output.
@@ -125,7 +123,7 @@ def submit(request):
 
   # Store the content object.
   content_key = 'paste:content:%s' % id
-  datastore.set(content_key, base64.b64encode(content))
+  datastore.set(content_key, content)
 
   response = {'id': id}
   return http.HttpResponse(json.dumps(response),
