@@ -1,7 +1,8 @@
 var _active_paste;
 
+
 // Initialization.
-$(function() {
+function init() {
   var pathname = window.location.pathname;
   if (pathname != '/') {
     loadPaste(pathname.substr(1));
@@ -13,7 +14,8 @@ $(function() {
 
   noWrapMode();
   noLinkifyMode();
-});
+}
+$(init);
 
 
 // Shows message banner with given content.
