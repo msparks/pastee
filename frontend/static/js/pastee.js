@@ -4,6 +4,14 @@ var _active_paste;
 // Initialization.
 function init() {
   var pathname = window.location.pathname;
+
+  // Handle redirection.
+  if (pathname.indexOf('/x/') == 0) {
+    var url = window.location.hash.substr(1);
+    redirect(url);
+    return;
+  }
+
   if (pathname != '/') {
     loadPaste(pathname.substr(1));
   } else {
@@ -16,6 +24,15 @@ function init() {
   noLinkifyMode();
 }
 $(init);
+
+
+// Redirects to 'url'. Employs deep magic to hide the referrer URL.
+function redirect(url) {
+  if (window.history && history.replaceState) {
+    history.replaceState(null, null, '/');
+  }
+  window.location.href = url;
+}
 
 
 // Shows message banner with given content.
@@ -232,6 +249,14 @@ function linkifyMode() {
   displayPaste(_active_paste);
   $('.linkify').unbind('click');
   $('.linkify').click(noLinkifyMode);
+
+  // Rewrite links to go through cloaking redirection.
+  $('.syntax pre a').each(function(idx, e) {
+    var href = $(e).attr('href');
+    $(e).attr('href', '/x/#' + href);
+    $(e).attr('title', href);
+    $(e).attr('target', '_blank');
+  });
 }
 
 
