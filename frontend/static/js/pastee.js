@@ -165,6 +165,7 @@ function wrapMode() {
   $('.linenos').hide();
   $('.syntax pre').addClass('wrapped');
   $('.wrap').addClass('selected');
+  $('.wrap').unbind('click');
   $('.wrap').click(noWrapMode);
 }
 
@@ -174,6 +175,7 @@ function noWrapMode() {
   $('.linenos').show();
   $('.syntax pre').removeClass('wrapped');
   $('.wrap').removeClass('selected');
+  $('.wrap').unbind('click');
   $('.wrap').click(wrapMode);
 }
 
