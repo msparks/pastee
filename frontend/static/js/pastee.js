@@ -63,6 +63,7 @@ function pasteAreaBlur() {
 $('.pastearea').blur(pasteAreaBlur);
 
 
+// Called on successful paste to the server.
 function pasteSuccess(data, text_status, jq_xhr) {
   // Update address bar with URL of paste.
   if (window.history && history.pushState) {
@@ -75,6 +76,7 @@ function pasteSuccess(data, text_status, jq_xhr) {
 }
 
 
+// Called on failure to paste to the server.
 function pasteError(jq_xhr, text_status, error) {
   if (jq_xhr.status == 403) {
     var error_obj = $.parseJSON(jq_xhr.responseText);
@@ -85,6 +87,7 @@ function pasteError(jq_xhr, text_status, error) {
 }
 
 
+// Starts an asynchronous paste load with ID 'id'.
 function loadPaste(id) {
   $('#newpaste').hide();
   $('#viewpaste').show();
@@ -98,11 +101,13 @@ function loadPaste(id) {
 }
 
 
+// Called on successful download of paste content.
 function loadPasteSuccess(data, text_status, jq_xhr) {
   $('.viewpastebox').html(data);
 }
 
 
+// Called on error downloading paste content.
 function loadPasteError(jq_xhr, text_status, error) {
   if (jq_xhr.status == 404) {
     var id = window.location.pathname.substr(1);
