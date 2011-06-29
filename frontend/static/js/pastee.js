@@ -150,8 +150,8 @@ function loadPasteMetadataError(jq_xhr, text_status, error) {
 
 // Called on successful download of paste content.
 function loadPasteContentSuccess(data, text_status, jq_xhr) {
-  _active_paste['content'] = data;
-  $('.viewpastebox').html(data);
+  _active_paste = data;
+  $('.viewpastebox').html(data['html']);
 }
 
 
@@ -185,7 +185,7 @@ function noWrapMode() {
 // Turns on linkify mode (adds hyperlinks).
 function linkifyMode() {
   $('.linkify').addClass('selected');
-  $('.viewpastebox').html(linkify(_active_paste['content']));
+  $('.viewpastebox').html(linkify(_active_paste['html']));
   $('.linkify').unbind('click');
   $('.linkify').click(noLinkifyMode);
 }
@@ -194,7 +194,7 @@ function linkifyMode() {
 // Turns off linkify mode.
 function noLinkifyMode() {
   $('.linkify').removeClass('selected');
-  $('.viewpastebox').html(_active_paste['content']);
+  $('.viewpastebox').html(_active_paste['html']);
   $('.linkify').unbind('click');
   $('.linkify').click(linkifyMode);
 }

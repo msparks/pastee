@@ -49,7 +49,14 @@ def get(request, id, raw=None):
     # HTML-ized output.
     lexer = formatting.validate_lexer_name(md.get('lexer', 'text'))
     html = formatting.htmlize(content, lexer)
-    return http.HttpResponse(html, content_type='text/html')
+    data = {'id': id,
+            'created': md.get('created', 0),
+            'lexer': formatting.lexer_longname(lexer),
+            'lexer_alias': lexer,
+            'ttl': md.get('ttl', 0),
+            'html': html,
+            'raw': content}
+    return http.HttpResponse(json.dumps(data), content_type=JSON_CONTENT_TYPE)
   else:
     # Plain text output.
     return http.HttpResponse(content, content_type='text/plain')
