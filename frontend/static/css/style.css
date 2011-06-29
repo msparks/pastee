@@ -222,7 +222,7 @@ div.pastebutton:hover {
 }
 
 .viewpastebox {
-  margin: 10px;
+  margin: 10px 10px 0 10px;
   overflow: auto;
 }
 
@@ -233,6 +233,7 @@ div.pastebutton:hover {
 
 .syntaxtable {
   width: 100%;
+  margin-bottom: 10px;
   background-color: inherit;
 }
 
