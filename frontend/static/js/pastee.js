@@ -154,14 +154,19 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
 
   // Determine if line-wrapping should be enabled on this paste.
   var lines = data.raw.split('\n');
-  var total_length = 0;
+  var long_lines = 0;
+  var nonblank_lines = 0;
   var max_line_length = 0;
   for (i in lines) {
-    total_length += lines[i].length;
+    if (lines[i] != '')
+      ++nonblank_lines;
+    if (lines[i].length > 82)
+      ++long_lines;
     max_line_length = Math.max(max_line_length, lines[i].length);
   }
-  var avg_line_length = total_length / lines.length;
-  var wrap_mode = (avg_line_length > 82);  // narrow enough for the viewer
+  var toolong_ratio = long_lines / nonblank_lines;
+
+  var wrap_mode = (toolong_ratio >= 0.5);
 
   if (wrap_mode)
     wrapMode();
