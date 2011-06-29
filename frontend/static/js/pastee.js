@@ -130,7 +130,32 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   $('.viewinfo').show();
 
   // Show paste content.
-  $('.viewpastebox').html(data['html']);
+  displayPaste(_active_paste);
+
+  // Determine if line-wrapping should be enabled on this paste.
+  var wrap_mode = false;
+  var lines = data['raw'].split('\n');
+  for (i in lines) {
+    if (lines[i].length > 82) {
+      wrap_mode = true;
+      break;
+    }
+  }
+
+  if (wrap_mode)
+    wrapMode();
+  else
+    noWrapMode();
+
+  // Determine if linkify mode should be enabled on this paste.
+  var linkify_mode = false;
+  if (linkify(data['html']) != data['html'])
+    linkify_mode = true;
+
+  if (linkify_mode)
+    linkifyMode();
+  else
+    noLinkifyMode();
 }
 
 
@@ -151,11 +176,31 @@ function loadPasteError(jq_xhr, text_status, error) {
 }
 
 
+function displayPaste(paste) {
+  if (paste.linkify_mode) {
+    $('.linkify').addClass('selected');
+    $('.viewpastebox').html(linkify(paste.html));
+  } else {
+    $('.linkify').removeClass('selected');
+    $('.viewpastebox').html(paste.html);
+  }
+
+  if (paste.wrap_mode) {
+    $('.linenos').hide();
+    $('.syntax pre').addClass('wrapped');
+    $('.wrap').addClass('selected');
+  } else {
+    $('.linenos').show();
+    $('.syntax pre').removeClass('wrapped');
+    $('.wrap').removeClass('selected');
+  }
+}
+
+
 // Turns on word-wrapping for the paste.
 function wrapMode() {
-  $('.linenos').hide();
-  $('.syntax pre').addClass('wrapped');
-  $('.wrap').addClass('selected');
+  _active_paste.wrap_mode = true;
+  displayPaste(_active_paste);
   $('.wrap').unbind('click');
   $('.wrap').click(noWrapMode);
 }
@@ -163,9 +208,8 @@ function wrapMode() {
 
 // Disables word-wrapping mode for the paste.
 function noWrapMode() {
-  $('.linenos').show();
-  $('.syntax pre').removeClass('wrapped');
-  $('.wrap').removeClass('selected');
+  _active_paste.wrap_mode = false;
+  displayPaste(_active_paste);
   $('.wrap').unbind('click');
   $('.wrap').click(wrapMode);
 }
@@ -173,8 +217,8 @@ function noWrapMode() {
 
 // Turns on linkify mode (adds hyperlinks).
 function linkifyMode() {
-  $('.linkify').addClass('selected');
-  $('.viewpastebox').html(linkify(_active_paste['html']));
+  _active_paste.linkify_mode = true;
+  displayPaste(_active_paste);
   $('.linkify').unbind('click');
   $('.linkify').click(noLinkifyMode);
 }
@@ -182,8 +226,8 @@ function linkifyMode() {
 
 // Turns off linkify mode.
 function noLinkifyMode() {
-  $('.linkify').removeClass('selected');
-  $('.viewpastebox').html(_active_paste['html']);
+  _active_paste.linkify_mode = false;
+  displayPaste(_active_paste);
   $('.linkify').unbind('click');
   $('.linkify').click(linkifyMode);
 }
