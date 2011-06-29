@@ -131,7 +131,6 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   $('.viewinfo').html('Paste ID <tt>' + link_html + '</tt> (' +
                       data.lexer + ', TTL: ' + ttl_days + ' days)');
   $('.viewinfo').show();
-  $('.viewmodes').show();
 
   // Show paste content.
   displayPaste(_active_paste);
@@ -139,15 +138,21 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   // Determine if line-wrapping should be enabled on this paste.
   var lines = data.raw.split('\n');
   var total_length = 0;
-  for (i in lines)
+  var max_line_length = 0;
+  for (i in lines) {
     total_length += lines[i].length;
+    max_line_length = Math.max(max_line_length, lines[i].length);
+  }
   var avg_line_length = total_length / lines.length;
-  var wrap_mode = (avg_line_length > 82);
+  var wrap_mode = (avg_line_length > 82);  // narrow enough for the viewer
 
   if (wrap_mode)
     wrapMode();
-  else
+  else if (max_line_length > 82)
     noWrapMode();
+  else
+    // Don't bother showing wrap button if all lines are short.
+    $('.wrap').hide();
 
   // Determine if linkify mode should be enabled on this paste.
   var linkify_mode = false;
@@ -157,7 +162,11 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   if (linkify_mode)
     linkifyMode();
   else
-    noLinkifyMode();
+    // No links were found anyway.
+    $('.linkify').hide();
+
+  // Show viewmode buttons after possibly hiding some of them.
+  $('.viewmodes').show();
 }
 
 
