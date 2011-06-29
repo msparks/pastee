@@ -55,6 +55,29 @@ def get(request, id, raw=None):
     return http.HttpResponse(content, content_type='text/plain')
 
 
+def metadata(request, id):
+  if len(id) > 100:
+    return error_response('Invalid ID', status=404)
+
+  # Look up metadata.
+  md_key = 'paste:metadata:%s' % id
+  md_json = datastore.get(md_key)
+  if md_json is None:
+    return error_response('Invalid ID', status=404)
+  md = json.loads(md_json)
+
+  # Return only certain pieces of the metadata through the API.
+  lexer_alias = md.get('lexer', 'text')
+  md_clean = {'id': id,
+              'created': md.get('created', 0),
+              'lexer': formatting.lexer_longname(lexer_alias),
+              'lexer_alias': lexer_alias,
+              'ttl': md.get('ttl', 0)}
+
+  return http.HttpResponse(json.dumps(md_clean),
+                           content_type=JSON_CONTENT_TYPE)
+
+
 def submit(request):
   err_msg = None
 

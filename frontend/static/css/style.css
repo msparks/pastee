@@ -221,8 +221,23 @@ div.pastebutton:hover {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
 }
 
+.viewinfo {
+  margin: 5px 5px 5px 10px;
+  color: #ccc;
+  font-size: 16px;
+}
+
+.viewinfo a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+.viewinfo a:hover {
+  text-decoration: underline;
+}
+
 .viewpastebox {
-  margin: 10px 10px 0 10px;
+  margin: 5px 10px 0 10px;
   overflow: auto;
 }
 
