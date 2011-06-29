@@ -25,6 +25,7 @@ function displayBanner(html) {
   setTimeout("hideBanner()", 3000);
 }
 
+
 // Hides the message banner.
 function hideBanner() {
   $('.banner').slideUp();
@@ -76,11 +77,11 @@ $('.pastearea').blur(pasteAreaBlur);
 function pasteSuccess(data, text_status, jq_xhr) {
   // Update address bar with URL of paste.
   if (window.history && history.pushState) {
-    history.pushState(null, null, data['id']);
-    loadPaste(data['id']);
+    history.pushState(null, null, data.id);
+    loadPaste(data.id);
   } else {
     // Brower does not support history.pushState.
-    window.location.pathname = '/' + data['id'];
+    window.location.pathname = '/' + data.id;
   }
 }
 
@@ -89,7 +90,7 @@ function pasteSuccess(data, text_status, jq_xhr) {
 function pasteError(jq_xhr, text_status, error) {
   if (jq_xhr.status == 403) {
     var error_obj = $.parseJSON(jq_xhr.responseText);
-    displayBanner(error_obj['error']);
+    displayBanner(error_obj.error);
   } else {
     displayBanner('Error ' + jq_xhr.status + '. Try again later.');
   }
@@ -118,15 +119,15 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   // Calculate TTL in days.
   var d = new Date();
   var epoch = d.getTime() / 1000;              // epoch in seconds
-  var expiry = data['ttl'] + data['created'];
+  var expiry = data.ttl + data.created;
   var ttl = expiry - epoch;                    // ttl in seconds
   var ttl_days = ttl / 86400;                  // ttl in days
   ttl_days = Math.round(ttl_days * 100) / 100;
 
   // Show paste info bar.
-  var link_html = '<a href="/' + data['id'] + '">' + data['id'] + '</a>';
+  var link_html = '<a href="/' + data.id + '">' + data.id + '</a>';
   $('.viewinfo').html('Paste ID <tt>' + link_html + '</tt> (' +
-                      data['lexer'] + ', TTL: ' + ttl_days + ' days)');
+                      data.lexer + ', TTL: ' + ttl_days + ' days)');
   $('.viewinfo').show();
 
   // Show paste content.
@@ -134,7 +135,7 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
 
   // Determine if line-wrapping should be enabled on this paste.
   var wrap_mode = false;
-  var lines = data['raw'].split('\n');
+  var lines = data.raw.split('\n');
   for (i in lines) {
     if (lines[i].length > 82) {
       wrap_mode = true;
@@ -149,7 +150,7 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
 
   // Determine if linkify mode should be enabled on this paste.
   var linkify_mode = false;
-  if (linkify(data['html']) != data['html'])
+  if (linkify(data.html) != data.html)
     linkify_mode = true;
 
   if (linkify_mode)
@@ -165,7 +166,7 @@ function loadPasteError(jq_xhr, text_status, error) {
     displayBanner('Paste ID \'' + id + '\' does not exist');
   } else if (jq_xhr.status == 403) {
     var error_obj = $.parseJSON(jq_xhr.responseText);
-    displayBanner(error_obj['error']);
+    displayBanner(error_obj.error);
   } else {
     displayBanner('Error ' + jq_xhr.status + '. Try again later.');
   }
