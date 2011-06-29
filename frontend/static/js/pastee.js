@@ -134,14 +134,12 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   displayPaste(_active_paste);
 
   // Determine if line-wrapping should be enabled on this paste.
-  var wrap_mode = false;
   var lines = data.raw.split('\n');
-  for (i in lines) {
-    if (lines[i].length > 82) {
-      wrap_mode = true;
-      break;
-    }
-  }
+  var total_length = 0;
+  for (i in lines)
+    total_length += lines[i].length;
+  var avg_line_length = total_length / lines.length;
+  var wrap_mode = (avg_line_length > 82);
 
   if (wrap_mode)
     wrapMode();
