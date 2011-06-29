@@ -231,10 +231,27 @@ div.pastebutton:hover {
   margin: 10px 10px 0 0;
   float: right;
   background-image: url('../img/wrap-bw.png');
+  opacity: 0.4;
+  -webkit-transition: opacity ease-out 200ms;
+  -moz-transition: opacity ease-out 200ms;
+  -ms-transition: opacity ease-out 200ms;
+  -o-transition: opacity ease-out 200ms;
+  transition: opacity ease-out 200ms;
 }
 
 .viewcontainer .wrap.selected {
   background-image: url('../img/wrap.png');
+  opacity: 1.0;
+}
+
+.viewcontainer .wrap:hover {
+  background-image: url('../img/wrap.png');
+  opacity: 1.0;
+  -webkit-transition: opacity ease-in 200ms;
+  -moz-transition: opacity ease-in 200ms;
+  -ms-transition: opacity ease-in 200ms;
+  -o-transition: opacity ease-in 200ms;
+  transition: opacity ease-in 200ms;
 }
 
 .viewcontainer .linkify {
@@ -243,10 +260,27 @@ div.pastebutton:hover {
   margin: 10px 10px 0 0;
   float: right;
   background-image: url('../img/link-bw.png');
+  opacity: 0.4;
+  -webkit-transition: opacity ease-out 200ms;
+  -moz-transition: opacity ease-out 200ms;
+  -ms-transition: opacity ease-out 200ms;
+  -o-transition: opacity ease-out 200ms;
+  transition: opacity ease-out 200ms;
 }
 
 .viewcontainer .linkify.selected {
   background-image: url('../img/link.png');
+  opacity: 1.0;
+}
+
+.viewcontainer .linkify:hover {
+  background-image: url('../img/link.png');
+  opacity: 1.0;
+  -webkit-transition: opacity ease-in 200ms;
+  -moz-transition: opacity ease-in 200ms;
+  -ms-transition: opacity ease-in 200ms;
+  -o-transition: opacity ease-in 200ms;
+  transition: opacity ease-in 200ms;
 }
 
 .viewinfo {
