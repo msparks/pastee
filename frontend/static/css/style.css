@@ -103,6 +103,10 @@ div.banner {
   font-size: 16px;
 }
 
+.pastearea.blur {
+  background-image: none;
+}
+
 .pastebox {
   position: relative;
   float: left;

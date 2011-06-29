@@ -60,7 +60,7 @@ $('#pb').click(pasteClick);
 
 // Called when the paste textarea gets focus.
 function pasteAreaFocus() {
-  $(this).css('background-image', 'none');
+  $(this).addClass('blur');
 }
 $('.pastearea').focus(pasteAreaFocus);
 
@@ -68,7 +68,7 @@ $('.pastearea').focus(pasteAreaFocus);
 // Called when the paste textarea loses focus.
 function pasteAreaBlur() {
   if ($('#_content').val() == '')
-    $(this).css('background-image', 'url(/static/img/pastehere.png)');
+    $(this).removeClass('blur');
 }
 $('.pastearea').blur(pasteAreaBlur);
 
