@@ -21,6 +21,14 @@ def lexer_longname(shortname):
       return longname
 
 
+def lexer_ext(shortname):
+  '''Returns the file extension used for a lexer.'''
+  shortname = validate_lexer_name(shortname)
+  lexer = pygments.lexers.get_lexer_by_name(shortname)
+  ext = lexer.filenames[0][2:]  # 'py', 'pl', etc.
+  return ext
+
+
 def lexer_list():
   lex_dict = {}
   for (longname, aliases, _, _) in pygments.lexers.get_all_lexers():

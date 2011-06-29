@@ -49,20 +49,23 @@ def get(request, id, mode=None):
     return http.HttpResponse(content, content_type='text/plain')
   elif download:
     # Download.
-    # TODO(ms): Some lexer aliases are not the conventional file extensions.
-    filename = 'pastee-%s.%s' % (id, md['lexer'])
+
+    # Lookup file extension for lexer.
+    lexer_alias = md.get('lexer', 'text')
+    filename = 'pastee-%s.%s' % (id, formatting.lexer_ext(lexer_alias))
+
     response = http.HttpResponse(content,
                                  content_type='application/octet-stream')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
   else:
     # HTML-ized output.
-    lexer = formatting.validate_lexer_name(md.get('lexer', 'text'))
-    html = formatting.htmlize(content, lexer)
+    lexer_alias = formatting.validate_lexer_name(md.get('lexer', 'text'))
+    html = formatting.htmlize(content, lexer_alias)
     data = {'id': id,
             'created': md.get('created', 0),
-            'lexer': formatting.lexer_longname(lexer),
-            'lexer_alias': lexer,
+            'lexer': formatting.lexer_longname(lexer_alias),
+            'lexer_alias': lexer_alias,
             'ttl': md.get('ttl', 0),
             'html': html,
             'raw': content}
