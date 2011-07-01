@@ -6,12 +6,15 @@ from django import http
 
 import datastore
 import formatting
-import idmgr
+import idmanager
 
 JSON_CONTENT_TYPE = 'application/json'
 MAX_LENGTH = 32 * 1024    # 32 KiB
 MAX_TTL = 86400 * 365     # 1 year
 DEFAULT_TTL = 86400 * 30  # 1 month
+
+# Datastore instance.
+ds = datastore.Datastore()
 
 
 def error_response(err_msg, status=403):
@@ -123,7 +126,8 @@ def submit(request):
                              content_type=JSON_CONTENT_TYPE)
 
   # Get an ID for the new paste.
-  id = idmgr.random_unused_id()
+  mgr = idmanager.IDManager(ds)
+  id = mgr.new_id()
 
   # Store the metadata object.
   md_key = 'paste:metadata:%s' % id
