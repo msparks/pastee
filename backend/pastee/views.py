@@ -14,7 +14,9 @@ MAX_TTL = 86400 * 365     # 1 year
 DEFAULT_TTL = 86400 * 30  # 1 month
 
 # Datastore instance.
-ds = datastore.Datastore()
+DS = datastore.Datastore()
+# TODO(ms): Set prefix based on site key.
+DS.prefix_is('pastee')
 
 
 def error_response(err_msg, status=403):
@@ -35,15 +37,15 @@ def get(request, id, mode=None):
 
   # Look up metadata.
   # TODO(ms): Handle expired posts.
-  md_key = 'paste:metadata:%s' % id
-  md_json = datastore.get(md_key)
+  md_key = 'metadata:%s' % id
+  md_json = DS.value(md_key)
   if md_json is None:
     return error_response('Invalid ID', status=404)
   md = json.loads(md_json)
 
   # Decode content.
-  content_key = 'paste:content:%s' % id
-  content = datastore.get(content_key)
+  content_key = 'content:%s' % id
+  content = DS.value(content_key)
   if content is None:
     return error_response('Expired', status=403)
 
@@ -80,8 +82,8 @@ def metadata(request, id):
     return error_response('Invalid ID', status=404)
 
   # Look up metadata.
-  md_key = 'paste:metadata:%s' % id
-  md_json = datastore.get(md_key)
+  md_key = 'metadata:%s' % id
+  md_json = DS.value(md_key)
   if md_json is None:
     return error_response('Invalid ID', status=404)
   md = json.loads(md_json)
@@ -126,20 +128,20 @@ def submit(request):
                              content_type=JSON_CONTENT_TYPE)
 
   # Get an ID for the new paste.
-  mgr = idmanager.IDManager(ds)
+  mgr = idmanager.IDManager(DS)
   id = mgr.new_id()
 
   # Store the metadata object.
-  md_key = 'paste:metadata:%s' % id
+  md_key = 'metadata:%s' % id
   md = {'ttl': ttl,
         'lexer': lexer,
         'ip_address': request.META.get('REMOTE_ADDR'),
         'created': int(time.time())}
-  datastore.set(md_key, json.dumps(md))
+  DS.value_is(md_key, json.dumps(md))
 
   # Store the content object.
-  content_key = 'paste:content:%s' % id
-  datastore.set(content_key, content)
+  content_key = 'content:%s' % id
+  DS.value_is(content_key, content)
 
   response = {'id': id}
   return http.HttpResponse(json.dumps(response),
