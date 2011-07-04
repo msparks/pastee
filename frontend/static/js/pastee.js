@@ -64,12 +64,17 @@ function pasteClick() {
     encrypted: (encrypt == 'yes') ? true : false
   };
 
+  // Disable the 'Paste' button while the request processes.
+  $('#pb').attr('disabled', 'disabled');
+  $('#pb').html('Pasting');
+
   $.ajax({
     type: 'POST',
     url: '/api/submit',
     data: post_data,
     success: pasteSuccess,
-    error: pasteError
+    error: pasteError,
+    complete: pasteComplete
   });
 }
 $('#pb').click(pasteClick);
@@ -100,6 +105,15 @@ function pasteSuccess(data, text_status, jq_xhr) {
     // Brower does not support history.pushState.
     window.location.pathname = '/' + data.id;
   }
+}
+
+
+// Called when the paste operation completes, either successfully or
+// unsuccessfully.
+function pasteComplete(jq_xhr, text_status) {
+  // Re-enable paste button.
+  $('#pb').removeAttr('disabled');
+  $('#pb').html('Paste');
 }
 
 
