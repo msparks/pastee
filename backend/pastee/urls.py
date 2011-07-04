@@ -5,7 +5,6 @@ urlpatterns = patterns('backend.pastee.views',
   (r'^$', 'index'),
   (r'^submit$', 'submit'),
   (r'^get/(?P<id>[a-zA-Z0-9]+)(?P<mode>/(raw|download))?$', 'get'),
-  (r'^metadata/(?P<id>[a-zA-Z0-9]+)$', 'metadata'),
 
   (r'^api$', 'api'),
   (r'^statistics$', 'statistics'),
