@@ -98,7 +98,7 @@ class IDManager(object):
       try:
         # Try to reserve this ID. The value does not matter; we only need to
         # lock the key in the datastore.
-        self._ds.nxvalue_is(key, 1)
+        self._ds.nxvalue_is(key, '{}')
       except KeyError:
         # This ID already exists. Try again.
         continue
