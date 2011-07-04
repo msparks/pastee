@@ -6,7 +6,6 @@ from django import http
 
 import datastore
 import formatting
-import idmanager
 import paste
 
 JSON_CONTENT_TYPE = 'application/json'

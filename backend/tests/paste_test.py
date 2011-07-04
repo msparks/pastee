@@ -7,7 +7,6 @@ import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from pastee import datastore
-from pastee import idmanager
 from pastee import paste
 
 
@@ -19,7 +18,6 @@ class Test_Paste:
   def setup(self):
     self._ds = datastore.Datastore()
     self._testing_prefix = 'pastee:test'
-    self._mgr = idmanager.IDManager(self._ds)
     self._paste = paste.Paste(self._ds)
 
   def _test_attribute(self, attr_name, value):
