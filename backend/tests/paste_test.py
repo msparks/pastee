@@ -17,7 +17,7 @@ class Test_Paste:
   '''
   def setup(self):
     self._ds = datastore.Datastore()
-    self._testing_prefix = 'pastee:test'
+    self._ds.prefix_is('pastee:test')
     self._paste = paste.Paste(self._ds)
 
   def _test_attribute(self, attr_name, value):

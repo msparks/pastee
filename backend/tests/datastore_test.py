@@ -51,6 +51,8 @@ class Test_Datastore:
 
   def test_nxvalue(self):
     '''Live test: nxvalue_is()'''
+    self._ds.prefix_is(self._testing_prefix)
+
     # Create a key.
     key = 'my_foo_key'
     self._ds.value_is(key, 'value')
@@ -63,6 +65,7 @@ class Test_Datastore:
 
   def test_exists(self):
     '''Live test: exists()'''
+    self._ds.prefix_is(self._testing_prefix)
     keys = ('foo', 'bar', 'baz', 'quux', u'føø/bárkey')
     for key in keys:
       self._ds.value_is(key, 'value')
@@ -71,6 +74,7 @@ class Test_Datastore:
 
   def test_delete(self):
     '''Live test: delete()'''
+    self._ds.prefix_is(self._testing_prefix)
     keys = ('foo', 'bar', 'baz', 'quux', u'føø/bárkey')
     for key in keys:
       self._ds.value_is(key, 'value')
