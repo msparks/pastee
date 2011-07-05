@@ -9,7 +9,9 @@ class Datastore(object):
     self._prefix = u''
 
   def _key(self, key):
-    '''Returns 'key' with the prefix prepended.'''
+    '''Returns 'key' with the prefix prepended, if any.'''
+    if self._prefix == '':
+      return key
     return u'%s:%s' % (self._prefix, key)
 
   def prefix(self):
@@ -91,7 +93,7 @@ class Datastore(object):
     keys = self._conn.keys(self._key(pattern))
 
     # Remove prefix from all keys.
-    prefix = u'%s:' % self._prefix
+    prefix = self._key('')
     keys = [x.decode('utf-8')[len(prefix):] for x in keys]
     return keys
 
