@@ -53,6 +53,9 @@ class Paste(object):
     CLEAN = 0
     DIRTY = 1
 
+  # Temporary value used as a lock.
+  PLACEHOLDER = 'placeholder'
+
   def __init__(self, ds, id=None):
     '''Constructor. If id is specified, the given paste id is retrieved.
     Otherwise, a new paste ID is allocated.
@@ -82,19 +85,18 @@ class Paste(object):
     '''Return a new, unused paste ID.
 
     The returned ID is guaranteed not to previously exist. When this method
-    returns, a metadata placeholder will exist for the new ID.
+    returns, a placeholder will exist for the new ID.
 
     Returns:
       id string
     '''
     while True:
       new_id = _random_id()
-      key = 'metadata:%s' % new_id
+      key = 'paste:%s' % new_id
 
       try:
-        # Try to reserve this ID. The value does not matter; we only need to
-        # lock the key in the datastore.
-        self._ds.nxvalue_is(key, '{}')
+        # Try to reserve this ID.
+        self._ds.nxvalue_is(key, self.PLACEHOLDER)
       except KeyError:
         # This ID already exists. Try again.
         continue
@@ -111,7 +113,7 @@ class Paste(object):
     # Save the metadata.
     md_key = 'paste:%s' % self._id
     md_json = self._ds.value(md_key)
-    if md_json is None:
+    if md_json is None or md_json == self.PLACEHOLDER:
       raise KeyError, 'no such ID'
     md = json.loads(md_json)
 
