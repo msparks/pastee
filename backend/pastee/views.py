@@ -3,6 +3,7 @@ import pprint
 import time
 
 from django import http
+from .. import settings
 
 import datastore
 import formatting
@@ -15,8 +16,10 @@ DEFAULT_TTL = 86400 * 30  # 1 month
 
 # Datastore instance.
 DS = datastore.Datastore()
-# TODO(ms): Set prefix based on site key.
-DS.prefix_is('pastee')
+KEY_PREFIX = u'pastee'
+if getattr(settings, 'SITE_PREFIX', '') != '':
+  KEY_PREFIX = u'%s:%s' % (KEY_PREFIX, getattr(settings, 'SITE_PREFIX'))
+DS.prefix_is(KEY_PREFIX)
 
 
 def error_response(err_msg, status=403):

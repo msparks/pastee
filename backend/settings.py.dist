@@ -18,6 +18,12 @@ MANAGERS = ADMINS
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '#2=t64a9-^0k^eus_e+&_7_CHANGE_THIS_KEY_^)b3h1(f(3ol!a=(9i(1u$g905'
 
+# This helps make the keys created in the datastore unique to this installation
+# of Pastee. Change this to a unique string for each instance of Pastee using
+# the same datastore.
+# WARNING: Changing this prefix will cause existing pastes to be found.
+SITE_PREFIX = '39mzr'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
