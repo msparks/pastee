@@ -225,21 +225,35 @@ function displayInfoBar(paste) {
   var epoch = d.getTime() / 1000;              // epoch in seconds
   var expiry = paste.ttl + paste.created;
   var ttl = expiry - epoch;                    // ttl in seconds
-  var ttl_adj = ttl / 86400;                   // ttl in days
-  var ttl_unit = 'days';
+  var ttl_adj = ttl;
+  var ttl_unit;
+
+  if (ttl <= 60) {
+    ttl_unit = 'seconds';
+  } else if (ttl <= 3600) {
+    ttl_adj /= 60;
+    ttl_unit = 'minutes';
+  } else if (ttl <= 86400) {
+    ttl_adj /= 3600;
+    ttl_unit = 'hours';
+  } else {
+    ttl_adj /= 86400;
+    ttl_unit = 'days';
+  }
   ttl_adj = Math.round(ttl_adj * 100) / 100;
 
-  // Handle smaller TTLs.
-  if (ttl_adj < 1) {  // < 1 day
-    ttl_adj = ttl_adj * 24;
-    ttl_unit = 'hours';
-  }
+  // Friendly TTL text.
+  var ttl_text = ttl_adj + ' ' + ttl_unit;
 
   // Show paste info bar.
-  var link_html = '<a href="/' + paste.id + '">' + paste.id + '</a>';
-  $('.viewinfo').html('Paste ID <tt>' + link_html + '</tt> (' +
-                      paste.lexer + ', TTL: ' + ttl_adj + ' ' + ttl_unit + ')');
+  $('.viewinfo .viewid').attr('href', '/' + paste.id);
+  $('.viewinfo .viewid').html(paste.id);
+  $('.viewinfo .viewlexer').html(paste.lexer);
+  $('.viewinfo .viewttl').html(ttl_text);
   $('.viewinfo').show();
+
+  // Update the TTL periodically.
+  setTimeout(function() { displayInfoBar(paste); }, 30000);  // 30 seconds
 }
 
 
