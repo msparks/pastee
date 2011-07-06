@@ -68,6 +68,34 @@ class Datastore(object):
     if not success:
       raise KeyError, 'key already exists'
 
+  def ttl(self, key):
+    '''Returns the TTL (in seconds) for a key.
+
+    Args:
+      key: string key
+
+    Returns:
+      TTL in seconds, or None if the key does not exist or does not have a TTL.
+    '''
+    return self._conn.ttl(self._key(key))
+
+  def ttl_is(self, key, ttl):
+    '''Sets the TTL (time to live) of a key.
+
+    The TTL is removed automatically if this key's value is later updated.
+
+    Args:
+      key: string key
+      ttl: Time to live in seconds, or None for no expiry.
+
+    Returns:
+      True on success (key exists and TTL was set)
+    '''
+    if ttl is None:
+      return self._conn.persist(self._key(key))
+    else:
+      return self._conn.expire(self._key(key), ttl)
+
   def delete(self, key):
     '''Deletes a key.
 

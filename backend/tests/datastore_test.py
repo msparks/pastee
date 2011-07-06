@@ -3,6 +3,7 @@
 from nose.tools import *
 import os
 import sys
+import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from pastee import datastore
@@ -81,6 +82,33 @@ class Test_Datastore:
       assert_true(self._ds.exists(key))
       assert_true(self._ds.delete(key))
       assert_false(self._ds.exists(key))
+
+  def test_ttl(self):
+    '''Live test: ttl() and ttl_is()'''
+    self._ds.prefix_is(self._testing_prefix)
+
+    # Create two keys: one will persist, one will expire.
+    key_long = 'foo long'
+    key_short = 'foo short'
+    for key in (key_short, key_long):
+      self._ds.value_is(key, 'value')
+
+    # Set an expiration on both keys.
+    ttl = 1  # seconds
+    for key in (key_short, key_long):
+      assert_true(self._ds.ttl_is(key, ttl))
+
+    # Query expiration. Should not have changed in a short timeframe.
+    for key in (key_short, key_long):
+      assert_equals(self._ds.ttl(key), 1)
+
+    # Remove expiration on the key to persist.
+    assert_true(self._ds.ttl_is(key_long, None))
+
+    # Wait for a short period. Expiring Key should be removed.
+    time.sleep(2)
+    assert_false(self._ds.exists(key_short))
+    assert_true(self._ds.exists(key_long))
 
   def teardown(self):
     '''Clean up.'''
