@@ -1,9 +1,14 @@
 import json
+import os
 import pprint
+import sys
 import time
 
 from django import http
-from .. import settings
+
+# Using a relative import causes a problem with nosetests. Add a path instead.
+sys.path.append(os.path.join(__file__, '..'))
+import settings
 
 import datastore
 import formatting
