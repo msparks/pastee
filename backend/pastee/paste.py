@@ -101,7 +101,9 @@ class Paste(object):
         # This ID already exists. Try again.
         continue
       else:
-        # We reserved this ID. We're done.
+        # We reserved this ID. Set a TTL on it so it gets garbage collected
+        # eventually if it is not updated with a real object.
+        self._ds.ttl_is(key, 3600)  # 1 hour
         return new_id
 
   def _load(self):
