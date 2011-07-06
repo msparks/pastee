@@ -183,9 +183,12 @@ div .pl {
 /* Security options. */
 div .security {
   font-size: 20px;
-  color: #333;
-  border-radius: 7px;
+  color: #888;
   margin-left: 30px;
+}
+
+div .security label {
+  font-weight: normal;
 }
 
 /* Clickable paste button to submit a paste. */
