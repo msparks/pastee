@@ -84,6 +84,8 @@ class Test_Datastore:
 
   def teardown(self):
     '''Clean up.'''
+    # Set the prefix correctly, else we end up clearing the datastore entirely.
+    self._ds.prefix_is(self._testing_prefix)
     keys = self._ds.keys()  # only keys starting with the testing prefix
     for key in keys:
       self._ds.delete(key)
