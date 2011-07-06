@@ -221,29 +221,38 @@ function loadPasteError(jq_xhr, text_status, error) {
 // Updates and displays the paste info bar.
 function displayInfoBar(paste) {
   // Calculate TTL in days.
-  var d = new Date();
-  var epoch = d.getTime() / 1000;              // epoch in seconds
+  var now = new Date();
+  var epoch = now.getTime() / 1000;        // epoch in seconds
   var expiry = paste.ttl + paste.created;
-  var ttl = expiry - epoch;                    // ttl in seconds
-  var ttl_adj = ttl;
-  var ttl_unit;
+  var ttl = expiry - epoch;                // ttl in seconds
 
-  if (ttl <= 60) {
-    ttl_unit = 'seconds';
-  } else if (ttl <= 3600) {
-    ttl_adj /= 60;
-    ttl_unit = 'minutes';
-  } else if (ttl <= 86400) {
-    ttl_adj /= 3600;
-    ttl_unit = 'hours';
-  } else {
-    ttl_adj /= 86400;
-    ttl_unit = 'days';
-  }
-  ttl_adj = Math.round(ttl_adj * 100) / 100;
+  // Divide into component parts.
+  var ttl_s = ttl;
+  var ttl_d_rounded = Math.round(ttl_s / 86400);
+  var ttl_d = Math.floor(ttl_s / 86400);
+  ttl_s -= ttl_d * 86400;
+  var ttl_h = Math.floor(ttl_s / 3600);
+  ttl_s -= ttl_h * 3600;
+  var ttl_m = Math.floor(ttl_s / 60);
+  ttl_s -= ttl_m * 60;
+  ttl_s = Math.floor(ttl_s);
 
   // Friendly TTL text.
-  var ttl_text = ttl_adj + ' ' + ttl_unit;
+  var update_timeout = 60 * 60 * 1000;     // 1 hour by default
+  var ttl_text;
+  if (ttl_d > 0) {
+    // At least one full day left. Don't bother displaying countdown.
+    ttl_text = ttl_d_rounded + ' ';
+    ttl_text += (ttl_d_rounded == 1) ? 'day' : 'days';
+  } else {
+    // Less than a day. Countdown.
+    ttl_text = (zeroPad(ttl_h, 2) + ':' +
+                zeroPad(ttl_m, 2) + ':' +
+                zeroPad(ttl_s, 2));
+
+    // Update every second.
+    update_timeout = 1000;
+  }
 
   // Show paste info bar.
   $('.viewinfo .viewid').attr('href', '/' + paste.id);
@@ -253,7 +262,14 @@ function displayInfoBar(paste) {
   $('.viewinfo').show();
 
   // Update the TTL periodically.
-  setTimeout(function() { displayInfoBar(paste); }, 30000);  // 30 seconds
+  setTimeout(function() { displayInfoBar(paste); }, update_timeout);
+}
+
+function zeroPad(n, digits) {
+  n = n.toString();
+  while (n.length < digits)
+    n = '0' + n;
+  return n;
 }
 
 
