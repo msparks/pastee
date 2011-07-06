@@ -149,6 +149,9 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   // Save paste data to enable reverting.
   _active_paste = data;
 
+  // Set page title.
+  $('title').html('Pastee: ' + data.id);
+
   // Calculate TTL in days.
   var d = new Date();
   var epoch = d.getTime() / 1000;              // epoch in seconds
@@ -207,6 +210,9 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
 
 
 function loadPasteError(jq_xhr, text_status, error) {
+  // Reset the page title.
+  $('title').html('Pastee');
+
   if (jq_xhr.status == 404) {
     var id = window.location.pathname.substr(1);
     displayBanner('Paste ID \'' + id + '\' does not exist');
