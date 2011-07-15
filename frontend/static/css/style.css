@@ -301,6 +301,11 @@ div.pastebutton:hover {
   text-decoration: underline;
 }
 
+.viewinfo .viewid.expired {
+  color: red;
+  text-decoration: line-through;
+}
+
 .viewpastebox {
   margin: 5px 10px 0 10px;
   overflow: auto;

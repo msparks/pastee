@@ -258,44 +258,54 @@ function displayInfoBar(paste) {
   var epoch = now.getTime() / 1000;        // epoch in seconds
   var expiry = paste.ttl + paste.created;
   var ttl = expiry - epoch;                // ttl in seconds
-
-  // Divide into component parts.
-  var ttl_s = ttl;
-  var ttl_d_rounded = Math.round(ttl_s / 86400);
-  var ttl_d = Math.floor(ttl_s / 86400);
-  ttl_s -= ttl_d * 86400;
-  var ttl_h = Math.floor(ttl_s / 3600);
-  ttl_s -= ttl_h * 3600;
-  var ttl_m = Math.floor(ttl_s / 60);
-  ttl_s -= ttl_m * 60;
-  ttl_s = Math.floor(ttl_s);
-
-  // Friendly TTL text.
-  var update_timeout = 60 * 60 * 1000;     // 1 hour by default
   var ttl_text;
-  if (ttl_d > 0) {
-    // At least one full day left. Don't bother displaying countdown.
-    ttl_text = ttl_d_rounded + ' ';
-    ttl_text += (ttl_d_rounded == 1) ? 'day' : 'days';
-  } else {
-    // Less than a day. Countdown.
-    ttl_text = (zeroPad(ttl_h, 2) + ':' +
-                zeroPad(ttl_m, 2) + ':' +
-                zeroPad(ttl_s, 2));
+  var expired = (ttl <= 0);
 
-    // Update every second.
-    update_timeout = 1000;
+  if (!expired) {
+    // Divide into component parts.
+    var ttl_s = ttl;
+    var ttl_d_rounded = Math.round(ttl_s / 86400);
+    var ttl_d = Math.floor(ttl_s / 86400);
+    ttl_s -= ttl_d * 86400;
+    var ttl_h = Math.floor(ttl_s / 3600);
+    ttl_s -= ttl_h * 3600;
+    var ttl_m = Math.floor(ttl_s / 60);
+    ttl_s -= ttl_m * 60;
+    ttl_s = Math.floor(ttl_s);
+
+    // Friendly TTL text.
+    var update_timeout = 60 * 60 * 1000;     // 1 hour by default
+    if (ttl_d > 0) {
+      // At least one full day left. Don't bother displaying countdown.
+      ttl_text = ttl_d_rounded + ' ';
+      ttl_text += (ttl_d_rounded == 1) ? 'day' : 'days';
+    } else {
+      // Less than a day. Countdown.
+      ttl_text = (zeroPad(ttl_h, 2) + ':' +
+                  zeroPad(ttl_m, 2) + ':' +
+                  zeroPad(ttl_s, 2));
+
+      // Update every second.
+      update_timeout = 1000;
+    }
+
+    // Update the TTL periodically.
+    setTimeout(function() { displayInfoBar(paste); }, update_timeout);
+  } else {
+    ttl_text = "expired";
   }
 
   // Show paste info bar.
   $('.viewinfo .viewid').attr('href', '/' + paste.id);
   $('.viewinfo .viewid').html(paste.id);
+  if (expired)
+    $('.viewinfo .viewid').addClass('expired');
+  else
+    $('.viewinfo .viewid').removeClass('expired');
+
   $('.viewinfo .viewlexer').html(paste.lexer);
   $('.viewinfo .viewttl').html(ttl_text);
   $('.viewinfo').show();
-
-  // Update the TTL periodically.
-  setTimeout(function() { displayInfoBar(paste); }, update_timeout);
 }
 
 function zeroPad(n, digits) {
