@@ -183,6 +183,10 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   // Show paste content.
   displayPaste(_active_paste);
 
+  // Reset info bar buttons.
+  $('.linkify').show();
+  $('.wrap').show();
+
   // Update raw and download links.
   $('#viewpaste a.raw').attr('href', '/api/get/' + data.id + '/raw');
   $('#viewpaste a.download').attr('href', '/api/get/' + data.id + '/download');
