@@ -27,8 +27,11 @@ if getattr(settings, 'SITE_PREFIX', '') != '':
 DS.prefix_is(KEY_PREFIX)
 
 
-def error_response(err_msg, status=403):
-  return http.HttpResponse(json.dumps({'error': err_msg}),
+def error_response(err_msg, status=403, id=None):
+  data = {'error': err_msg}
+  if id is not None:
+    data['id'] = id
+  return http.HttpResponse(json.dumps(data),
                            status=status,
                            content_type=JSON_CONTENT_TYPE)
 
@@ -41,19 +44,24 @@ def get(request, id, mode=None):
   raw = (mode == '/raw')
   download = (mode == '/download')
   if len(id) > 100:
-    return error_response('Invalid ID', status=404)
+    return error_response('Invalid ID', status=404, id=id)
 
   # Lookup saved paste.
-  # TODO(ms): Handle expired posts.
   try:
     saved_paste = paste.Paste(DS, id=id)
   except KeyError:
-    return error_response('Invalid ID', status=404)
+    return error_response('Invalid ID', status=404, id=id)
 
   # Decode content.
   content = saved_paste.content()
   if content is None:
-    return error_response('Expired', status=403)
+    return error_response('Expired', status=403, id=id)
+
+  # Check for TTL expiry.
+  # NOTE(ms): Lack of content should not be the only indicator of expiry, as
+  #   the deletion daemon might not have run yet for this paste.
+  if saved_paste.created() + saved_paste.ttl() <= time.time():
+    return error_response('Expired', status=403, id=id)
 
   if raw:
     # Plain text output.
@@ -106,9 +114,7 @@ def submit(request):
 
   # Handle errors.
   if err_msg:
-    return http.HttpResponse(json.dumps({'error': err_msg}),
-                             status=403,
-                             content_type=JSON_CONTENT_TYPE)
+    return error_response(err_msg, status=403)
 
   # Create paste.
   new_paste = paste.Paste(DS)
