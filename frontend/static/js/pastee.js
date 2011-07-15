@@ -14,10 +14,8 @@ function init() {
 
   if (pathname != '/') {
     loadPaste(pathname.substr(1));
-    $('#newpaste').hide();
   } else {
-    $('#newpaste').show();
-    $('#viewpaste').hide();
+    showOnly('new');
   }
 
   _active_paste = { };
@@ -39,9 +37,7 @@ $('a.new').click(function(e) {
   // without a refresh.
   if (window.history && history.pushState) {
     $('#_content').val('');  // clear only the content field
-    $('#newpaste').show();
-    $('#viewpaste').hide();
-    $('#expiredpaste').hide();
+    showOnly('new');
     history.pushState(null, null, '/');
 
     // Stop propagation.
@@ -61,11 +57,24 @@ function redirect(url) {
 }
 
 
+// Shows the view of the given string name and hides all others.
+function showOnly(view) {
+  var views = new Array('new', 'view', 'expired');
+
+  // Hide all views.
+  for (var v in views)
+    $('#' + views[v] + 'paste').hide();
+
+  // Show given view.
+  $('#' + view + 'paste').show();
+}
+
+
 // Shows message banner with given content.
 function displayBanner(html) {
   $('.banner').html(html);
   $('.banner').slideDown();
-  setTimeout("hideBanner()", 3000);
+  setTimeout('hideBanner()', 3000);
 }
 
 
@@ -156,11 +165,7 @@ function pasteError(jq_xhr, text_status, error) {
 
 // Starts an asynchronous paste load with ID 'id'.
 function loadPaste(id) {
-  $('#expiredpaste').hide();
-  $('#newpaste').hide();
-  $('#viewpaste').show();
-  $('.viewinfo').hide();
-  $('.viewmodes').hide();
+  showOnly('view');
 
   // Request paste metadata and content.
   $.ajax({
@@ -266,8 +271,7 @@ function loadPasteError(jq_xhr, text_status, error) {
   }
 
   // Show new paste box.
-  $('#viewpaste').hide();
-  $('#newpaste').show();
+  showOnly('new');
 }
 
 
@@ -312,7 +316,7 @@ function displayInfoBar(paste) {
     // Update the TTL periodically.
     setTimeout(function() { displayInfoBar(paste); }, update_timeout);
   } else {
-    ttl_text = "expired";
+    ttl_text = 'expired';
   }
 
   // Show paste info bar.
@@ -360,9 +364,7 @@ function displayPaste(paste) {
 
 // Displays expired paste error message.
 function displayExpiredPasteError(paste) {
-  $('#newpaste').hide();
-  $('#viewpaste').hide();
-  $('#expiredpaste').show();
+  showOnly('expired');
 
   $('.expiredcontainer .expiredid').html(paste.id);
 }
