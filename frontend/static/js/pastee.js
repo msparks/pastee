@@ -14,8 +14,10 @@ function init() {
 
   if (pathname != '/') {
     loadPaste(pathname.substr(1));
+    $('#newpaste').hide();
   } else {
     $('#newpaste').show();
+    $('#viewpaste').hide();
   }
 
   _active_paste = { };
@@ -24,6 +26,29 @@ function init() {
   noLinkifyMode();
 }
 $(init);
+
+
+// Re-initialize page state if the back button is clicked.
+$(window).bind('popstate', init);
+
+
+// Short-circuit 'new paste' link.
+$('#viewpaste a.new').unbind('click');
+$('#viewpaste a.new').click(function(e) {
+  // Browsers that support history modification can change the page state
+  // without a refresh.
+  if (window.history && history.pushState) {
+    $('#_content').val('');  // clear only the content field
+    $('#newpaste').show();
+    $('#viewpaste').hide();
+    history.pushState(null, null, '/');
+
+    // Stop propagation.
+    return false;
+  }
+
+  return true;
+});
 
 
 // Redirects to 'url'. Employs deep magic to hide the referrer URL.
