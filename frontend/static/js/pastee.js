@@ -33,14 +33,15 @@ $(window).bind('popstate', init);
 
 
 // Short-circuit 'new paste' link.
-$('#viewpaste a.new').unbind('click');
-$('#viewpaste a.new').click(function(e) {
+$('a.new').unbind('click');
+$('a.new').click(function(e) {
   // Browsers that support history modification can change the page state
   // without a refresh.
   if (window.history && history.pushState) {
     $('#_content').val('');  // clear only the content field
     $('#newpaste').show();
     $('#viewpaste').hide();
+    $('#expiredpaste').hide();
     history.pushState(null, null, '/');
 
     // Stop propagation.
@@ -155,6 +156,7 @@ function pasteError(jq_xhr, text_status, error) {
 
 // Starts an asynchronous paste load with ID 'id'.
 function loadPaste(id) {
+  $('#expiredpaste').hide();
   $('#newpaste').hide();
   $('#viewpaste').show();
   $('.viewinfo').hide();
@@ -171,6 +173,12 @@ function loadPaste(id) {
 
 
 function loadPasteSuccess(data, text_status, jq_xhr) {
+  // Stop on expired pastes.
+  if (expired(data)) {
+    displayExpiredPasteError(data);
+    return;
+  }
+
   // Save paste data to enable reverting.
   _active_paste = data;
 
@@ -180,15 +188,17 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   // Show info bar.
   displayInfoBar(_active_paste);
 
-  // Show paste content.
-  displayPaste(_active_paste);
-
   // Reset info bar buttons.
   $('.linkify').show();
   $('.wrap').show();
 
+  // Show paste content.
+  displayPaste(_active_paste);
+
   // Update raw and download links.
+  $('#viewpaste a.raw').show();
   $('#viewpaste a.raw').attr('href', '/api/get/' + data.id + '/raw');
+  $('#viewpaste a.download').show();
   $('#viewpaste a.download').attr('href', '/api/get/' + data.id + '/download');
 
   // Determine if line-wrapping should be enabled on this paste.
@@ -228,6 +238,16 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
 
   // Show viewmode buttons after possibly hiding some of them.
   $('.viewmodes').show();
+}
+
+
+// Returns true if the given paste is expired (TTL <= 0).
+function expired(paste) {
+  var now = new Date();
+  var epoch = now.getTime() / 1000;        // epoch in seconds
+  var expiry = paste.ttl + paste.created;
+  var ttl = expiry - epoch;                // ttl in seconds
+  return (ttl <= 0);
 }
 
 
@@ -335,6 +355,16 @@ function displayPaste(paste) {
     $('.syntax pre').removeClass('wrapped');
     $('.wrap').removeClass('selected');
   }
+}
+
+
+// Displays expired paste error message.
+function displayExpiredPasteError(paste) {
+  $('#newpaste').hide();
+  $('#viewpaste').hide();
+  $('#expiredpaste').show();
+
+  $('.expiredcontainer .expiredid').html(paste.id);
 }
 
 
