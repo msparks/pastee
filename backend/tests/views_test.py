@@ -67,6 +67,37 @@ class Test_Views:
     created_delta = time.time() - int(response_obj['created'])
     assert_true(created_delta < 5)
 
+  def test_expired_paste(self):
+    '''Check paste expiry'''
+    ttl = 1
+
+    # Create a new post submission.
+    post_request = http.HttpRequest()
+    post_request.POST['content'] = 'foo'
+    post_request.POST['lexer'] = 'text'
+    post_request.POST['ttl'] = ttl
+    post_request.META['REMOTE_ADDR'] = '4.2.2.2'
+
+    # Verify successful submission.
+    response = views.submit(post_request)
+    assert_equal(response.status_code, 200)  # 200 = OK
+    assert_equal(response['Content-Type'], 'application/json')
+    response_obj = json.loads(response.content)
+    assert_true('id' in response_obj)
+
+    # Wait for paste to expire.
+    time.sleep(1.1)
+
+    # Request the new paste.
+    id = response_obj['id']
+    get_request = http.HttpRequest()
+    response = views.get(get_request, id)
+    assert_equal(response.status_code, 403)  # 403 = Forbidden (expired)
+    assert_equal(response['Content-Type'], 'application/json')
+    response_obj = json.loads(response.content)
+    assert_true('id' in response_obj)
+    assert_true('error' in response_obj)
+
   def teardown(self):
     '''Clean up.'''
     keys = views.DS.keys()  # only keys starting with the testing prefix
