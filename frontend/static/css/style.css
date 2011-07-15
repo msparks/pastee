@@ -247,16 +247,6 @@ div.pastebutton:hover {
   opacity: 1.0;
 }
 
-.viewcontainer .wrap:hover {
-  background-image: url('../img/wrap.png');
-  opacity: 1.0;
-  -webkit-transition: opacity ease-in 200ms;
-  -moz-transition: opacity ease-in 200ms;
-  -ms-transition: opacity ease-in 200ms;
-  -o-transition: opacity ease-in 200ms;
-  transition: opacity ease-in 200ms;
-}
-
 .viewcontainer .linkify {
   width: 16px;
   height: 16px;
@@ -274,16 +264,6 @@ div.pastebutton:hover {
 .viewcontainer .linkify.selected {
   background-image: url('../img/link.png');
   opacity: 1.0;
-}
-
-.viewcontainer .linkify:hover {
-  background-image: url('../img/link.png');
-  opacity: 1.0;
-  -webkit-transition: opacity ease-in 200ms;
-  -moz-transition: opacity ease-in 200ms;
-  -ms-transition: opacity ease-in 200ms;
-  -o-transition: opacity ease-in 200ms;
-  transition: opacity ease-in 200ms;
 }
 
 .viewinfo {
