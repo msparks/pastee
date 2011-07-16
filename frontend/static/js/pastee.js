@@ -70,6 +70,12 @@ function showOnly(view) {
 }
 
 
+// Shows paste-not-found banner.
+function displayNotFoundBanner(id) {
+  displayBanner('Paste ID \'' + id + '\' does not exist');
+}
+
+
 // Shows message banner with given content.
 function displayBanner(html) {
   $('.banner').html(html);
@@ -180,7 +186,7 @@ function loadPaste(id) {
 function loadPasteSuccess(data, text_status, jq_xhr) {
   // Stop on expired pastes.
   if (expired(data)) {
-    displayBanner('Paste ID \'' + data.id + '\' does not exist');
+    displayNotFoundBanner(data.id);
     showOnly('new');
     return;
   }
@@ -263,7 +269,7 @@ function loadPasteError(jq_xhr, text_status, error) {
 
   if (jq_xhr.status == 404) {
     var id = window.location.pathname.substr(1);
-    displayBanner('Paste ID \'' + id + '\' does not exist');
+    displayNotFoundBanner(id);
   } else if (jq_xhr.status == 403) {
     var error_obj = $.parseJSON(jq_xhr.responseText);
     displayBanner(error_obj.error);
