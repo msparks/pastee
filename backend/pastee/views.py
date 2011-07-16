@@ -55,13 +55,13 @@ def get(request, id, mode=None):
   # Decode content.
   content = saved_paste.content()
   if content is None:
-    return error_response('Expired', status=403, id=id)
+    return error_response('Invalid ID', status=404, id=id)
 
   # Check for TTL expiry.
   # NOTE(ms): Lack of content should not be the only indicator of expiry, as
   #   the deletion daemon might not have run yet for this paste.
   if saved_paste.created() + saved_paste.ttl() <= time.time():
-    return error_response('Expired', status=403, id=id)
+    return error_response('Invalid ID', status=404, id=id)
 
   if raw:
     # Plain text output.

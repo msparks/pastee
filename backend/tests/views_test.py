@@ -92,7 +92,7 @@ class Test_Views:
     id = response_obj['id']
     get_request = http.HttpRequest()
     response = views.get(get_request, id)
-    assert_equal(response.status_code, 403)  # 403 = Forbidden (expired)
+    assert_equal(response.status_code, 404)  # 404 = Not found
     assert_equal(response['Content-Type'], 'application/json')
     response_obj = json.loads(response.content)
     assert_true('id' in response_obj)
