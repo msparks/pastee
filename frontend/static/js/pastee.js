@@ -59,7 +59,7 @@ function redirect(url) {
 
 // Shows the view of the given string name and hides all others.
 function showOnly(view) {
-  var views = new Array('new', 'view', 'expired');
+  var views = new Array('new', 'view');
 
   // Hide all views.
   for (var v in views)
@@ -180,7 +180,8 @@ function loadPaste(id) {
 function loadPasteSuccess(data, text_status, jq_xhr) {
   // Stop on expired pastes.
   if (expired(data)) {
-    displayExpiredPasteError(data);
+    displayBanner('Paste ID \'' + data.id + '\' does not exist');
+    showOnly('new');
     return;
   }
 
@@ -359,14 +360,6 @@ function displayPaste(paste) {
     $('.syntax pre').removeClass('wrapped');
     $('.wrap').removeClass('selected');
   }
-}
-
-
-// Displays expired paste error message.
-function displayExpiredPasteError(paste) {
-  showOnly('expired');
-
-  $('.expiredcontainer .expiredid').html(paste.id);
 }
 
 

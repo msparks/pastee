@@ -349,34 +349,6 @@ div.pastebutton:hover {
 
 
 /**
- * View of expired paste error message.
- */
-
-.expiredcontainer {
-  margin: 0 auto;
-  min-height: 150px;
-  padding: 1px 0 5px 0;
-  width: 669px;
-  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
-  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.06) inset;
-}
-
-.expiredcontainer p {
-  margin: 0 auto;
-  padding-top: 20px;
-  text-align: center;
-  font-size: 24px;
-  color: #999;
-}
-
-#expiredpaste .ll {
-  margin-top: 5px;
-  margin-left: 30px;
-}
-
-
-/**
  * Footer style.
  */
 
