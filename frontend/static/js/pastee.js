@@ -76,6 +76,46 @@ function displayNotFoundBanner(id) {
 }
 
 
+// Shows error banner for given jQuery XHR.
+function displayError(jq_xhr) {
+  switch (jq_xhr.status) {
+  case 403:
+    var error_obj = $.parseJSON(jq_xhr.responseText);
+    diplayError403(error_obj.error);
+    break;
+  case 500:
+    displayError500();
+    break;
+  case 502:
+    displayError502();
+    break;
+  default:
+    displayBanner('Error ' + jq_xhr.status + '. Try again later..');
+    break;
+  }
+}
+
+
+// Shows banner for Error 403: forbidden.
+function displayError403(text) {
+  displayBanner(text);
+}
+
+
+// Shows banner for Error 500: server error.
+function displayError500() {
+  displayBanner('Something is wrong with the server. ' +
+                'Try again in a few minutes.');
+}
+
+
+// Shows banner for Error 502: bad gateway.
+function displayError502() {
+  displayBanner('The Pastee server seems to be down. ' +
+                'Try again in a few minutes.');
+}
+
+
 // Shows message banner with given content.
 function displayBanner(html) {
   $('.banner').html(html);
@@ -160,11 +200,10 @@ function pasteComplete(jq_xhr, text_status) {
 
 // Called on failure to paste to the server.
 function pasteError(jq_xhr, text_status, error) {
-  if (jq_xhr.status == 403) {
-    var error_obj = $.parseJSON(jq_xhr.responseText);
-    displayBanner(error_obj.error);
+  if (jq_xhr.status == 400) {
+    displayBanner('The server seems to be misconfigured. Try again later.');
   } else {
-    displayBanner('Error ' + jq_xhr.status + '. Try again later.');
+    displayError(jq_xhr);
   }
 }
 
@@ -270,11 +309,9 @@ function loadPasteError(jq_xhr, text_status, error) {
   if (jq_xhr.status == 404) {
     var id = window.location.pathname.substr(1);
     displayNotFoundBanner(id);
-  } else if (jq_xhr.status == 403) {
-    var error_obj = $.parseJSON(jq_xhr.responseText);
-    displayBanner(error_obj.error);
   } else {
-    displayBanner('Error ' + jq_xhr.status + '. Try again later.');
+    // All other errors are handled generally.
+    displayError(jq_xhr);
   }
 
   // Show new paste box.
