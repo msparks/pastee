@@ -3,6 +3,7 @@ import json
 import optparse
 import os
 import pprint
+import signal
 import sys
 import time
 
@@ -20,6 +21,10 @@ JSON_CONTENT_TYPE = 'application/json'
 MAX_LENGTH = 32 * 1024    # 32 KiB
 MAX_TTL = 86400 * 365     # 1 year
 DEFAULT_TTL = 86400 * 30  # 1 month
+
+# Test mode: keys created with the test mode prefix are removed upon shutdown.
+TEST_MODE = False
+TEST_MODE_PREFIX = 'pastee:test'
 
 # Datastore instance.
 DS = datastore.Datastore()
@@ -182,7 +187,22 @@ def submit():
   return json.dumps(response)
 
 
+def shutdown_handler(signum, frame):
+  print 'caught signal; shutting down'
+  if TEST_MODE and DS.prefix() == TEST_MODE_PREFIX:
+    keys = DS.keys()  # only keys starting with the testing prefix
+    for key in keys:
+      DS.delete(key)
+
+
 if __name__ == '__main__':
+  # Install signal handlers.
+  signal.signal(signal.SIGBUS, shutdown_handler)
+  signal.signal(signal.SIGINT, shutdown_handler)
+  signal.signal(signal.SIGQUIT, shutdown_handler)
+  signal.signal(signal.SIGSEGV, shutdown_handler)
+  signal.signal(signal.SIGTERM, shutdown_handler)
+
   # Option parser for commandline options.
   parser = optparse.OptionParser()
   parser.add_option('-r', '--reloader', dest='reloader',
@@ -194,6 +214,9 @@ if __name__ == '__main__':
   parser.add_option('-q', '--quiet', dest='quiet',
                     action='store_true', default=False,
                     help='Suppress output to stderr and stdout')
+  parser.add_option('--test', dest='test',
+                    action='store_true', default=False,
+                    help='Test mode: created keys will be removed on shutdown')
 
   # Parse commandline options.
   (options, args) = parser.parse_args()
@@ -201,6 +224,10 @@ if __name__ == '__main__':
   # Adjust backend settings from options.
   if options.debug:
     bottle.debug(True)
+  if options.test:
+    # Enable test mode.
+    TEST_MODE = True
+    DS.prefix_is(TEST_MODE_PREFIX)
 
   # Translate optparse options to bottle options.
   kwargs = { }
