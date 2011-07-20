@@ -38,11 +38,38 @@ class Test_Pastee:
 
   This performs live tests. See the datastore tests for more information.
   '''
+  def request(self, path, data=None, expected_status=200, expected_type=None):
+    '''Sends a request to /api/<path> and asserts the expected status.
+
+    Args:
+      path: path after /api/
+      data: data dictionary to pass (makes the request a POST)
+      expected_status: numeric HTTP code to assert on response
+      expected_type: expected content type string (defaults to json)
+
+    Returns:
+      urllib2.urlopen()'d response object
+    '''
+    if data is not None:
+      # Convert data if necessary.
+      for key in data.keys():
+        if type(data[key]) == unicode:
+          data[key] = data[key].encode('utf-8')
+      data = urllib.urlencode(data)
+
+    request = urllib2.Request('%s/api/%s' % (PASTEE_URL, path), data=data)
+    response = urllib2.urlopen(request)
+    assert_equal(response.getcode(), expected_status)
+
+    if expected_type is None:
+      expected_type = 'application/json; charset=UTF8'
+      assert_equal(response.headers['Content-Type'], expected_type)
+
+    return response
+
   def test_index(self):
     '''GET request /api/'''
-    request = urllib2.Request('%s/api/' % PASTEE_URL)
-    response = urllib2.urlopen(request)
-    assert_equal(response.getcode(), 200)
+    self.request('', expected_type='text/html; charset=UTF8')
 
   def test_submit_post(self):
     '''Submit a new paste'''
@@ -55,25 +82,16 @@ class Test_Pastee:
     data = {'content': content.encode('utf-8'),
             'lexer': lexer_alias,
             'ttl': ttl}
-    request = urllib2.Request('%s/api/submit' % PASTEE_URL,
-                              data=urllib.urlencode(data))
-    response = urllib2.urlopen(request)
-    assert_equal(response.getcode(), 200)  # 200 = OK
-    assert_equal(response.headers['Content-Type'],
-                 'application/json; charset=UTF8')
+    response = self.request('submit', data=data)
     response_obj = json.loads(response.read())
     assert_true('id' in response_obj)
 
     # Request the new paste.
     id = response_obj['id']
-    get_request = urllib2.Request('%s/api/get/%s' % (PASTEE_URL, id))
-    response = urllib2.urlopen(get_request)
-    assert_equal(response.headers['Content-Type'],
-                 'application/json; charset=UTF8')
+    response = self.request('get/%s' % id)
     response_obj = json.loads(response.read())
 
     # Ensure the returned values match those we inserted.
-    assert_equal(response_obj['id'], id)
     assert_equal(response_obj['raw'], content)
     assert_equal(response_obj['lexer'], lexer_name)
     assert_equal(response_obj['ttl'], ttl)
