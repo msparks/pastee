@@ -50,6 +50,11 @@ class Test_Pastee:
     Returns:
       urllib2.urlopen()'d response object
     '''
+    class NullHTTPErrorProcessor(urllib2.HTTPErrorProcessor):
+      def http_response(self, request, response):
+        return response
+    opener = urllib2.build_opener(NullHTTPErrorProcessor())
+
     if data is not None:
       # Convert data if necessary.
       for key in data.keys():
@@ -58,7 +63,7 @@ class Test_Pastee:
       data = urllib.urlencode(data)
 
     request = urllib2.Request('%s/api/%s' % (PASTEE_URL, path), data=data)
-    response = urllib2.urlopen(request)
+    response = opener.open(request)
     assert_equal(response.getcode(), expected_status)
 
     if expected_type is None:
@@ -99,3 +104,29 @@ class Test_Pastee:
     # Check the creation time.
     created_delta = time.time() - int(response_obj['created'])
     assert_true(created_delta < 5)
+
+  def test_expiry(self):
+    '''Check paste expiry'''
+    content = u'This is the content føøbár'
+    lexer_alias = 'text'
+    lexer_name = 'Text only'
+    ttl = 1
+
+    # Create a submit request.
+    data = {'content': content.encode('utf-8'),
+            'lexer': lexer_alias,
+            'ttl': ttl}
+    response = self.request('submit', data=data)
+    response_obj = json.loads(response.read())
+    assert_true('id' in response_obj)
+
+    # Wait for the paste to expire.
+    time.sleep(1.1)
+
+    # Request the new paste.
+    id = response_obj['id']
+    response = self.request('get/%s' % id, expected_status=404)  # not found
+    response_obj = json.loads(response.read())
+    assert_true('id' in response_obj)
+    assert_true('error' in response_obj)
+    assert_equal(response_obj['id'], id)
