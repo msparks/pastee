@@ -195,7 +195,7 @@ def shutdown_handler(signum, frame):
       DS.delete(key)
 
 
-if __name__ == '__main__':
+def main():
   # Install signal handlers.
   signal.signal(signal.SIGBUS, shutdown_handler)
   signal.signal(signal.SIGINT, shutdown_handler)
@@ -236,3 +236,7 @@ if __name__ == '__main__':
 
   # Run server.
   bottle.run(host='localhost', port=8000, **kwargs)
+
+
+if __name__ == '__main__':
+  main()
