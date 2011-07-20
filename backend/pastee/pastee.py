@@ -183,4 +183,9 @@ def submit():
 
 
 if __name__ == '__main__':
-  bottle.run(host='localhost', port=8000, reloader=True)
+  kwargs = { }
+  for arg in sys.argv[1:]:
+    if '=' in arg:
+      k, v = arg.split('=', 1)
+      kwargs[k] = v
+  bottle.run(host='localhost', port=8000, **kwargs)
