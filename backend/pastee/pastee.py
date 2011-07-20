@@ -205,15 +205,19 @@ def main():
 
   # Option parser for commandline options.
   parser = optparse.OptionParser()
-  parser.add_option('-r', '--reloader', dest='reloader',
-                    action='store_true', default=False,
-                    help='Turn on auto-reloader')
   parser.add_option('-d', '--debug', dest='debug',
                     action='store_true', default=False,
                     help='Enable debug output')
+  parser.add_option('-l', '--host', dest='host', default='localhost',
+                    help='Listening server hostname')
+  parser.add_option('-p', '--port', type='int', dest='port', default=8000,
+                    help='Listening server port')
   parser.add_option('-q', '--quiet', dest='quiet',
                     action='store_true', default=False,
                     help='Suppress output to stderr and stdout')
+  parser.add_option('-r', '--reloader', dest='reloader',
+                    action='store_true', default=False,
+                    help='Turn on auto-reloader')
   parser.add_option('--test', dest='test',
                     action='store_true', default=False,
                     help='Test mode: created keys will be removed on shutdown')
@@ -234,10 +238,12 @@ def main():
   kwargs = { }
   kwargs['quiet'] = options.quiet
   kwargs['reloader'] = options.reloader
+  kwargs['host'] = options.host
+  kwargs['port'] = options.port
 
   # Run server.
   try:
-    bottle.run(host='localhost', port=8000, **kwargs)
+    bottle.run(server='wsgiref', **kwargs)
   except select.error, e:
     num, msg = e
     if num == 4:  # 'Interrupted system call'
