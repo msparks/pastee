@@ -3,6 +3,7 @@ import json
 import optparse
 import os
 import pprint
+import select
 import signal
 import sys
 import time
@@ -188,7 +189,6 @@ def submit():
 
 
 def shutdown_handler(signum, frame):
-  print 'caught signal %d; shutting down' % signum
   if TEST_MODE and DS.prefix() == TEST_MODE_PREFIX:
     keys = DS.keys()  # only keys starting with the testing prefix
     for key in keys:
@@ -236,7 +236,14 @@ def main():
   kwargs['reloader'] = options.reloader
 
   # Run server.
-  bottle.run(host='localhost', port=8000, **kwargs)
+  try:
+    bottle.run(host='localhost', port=8000, **kwargs)
+  except select.error, e:
+    num, msg = e
+    if num == 4:  # 'Interrupted system call'
+      pass
+    else:
+      raise
 
 
 if __name__ == '__main__':
