@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import json
+import optparse
 import os
 import pprint
 import sys
@@ -183,9 +184,18 @@ def submit():
 
 
 if __name__ == '__main__':
+  # Option parser for commandline options.
+  parser = optparse.OptionParser()
+  parser.add_option('-q', '--quiet', dest='quiet',
+                    action='store_true', default=False,
+                    help='Suppress output to stderr and stdout')
+
+  # Parse commandline options.
+  (options, args) = parser.parse_args()
+
+  # Translate optparse options to bottle options.
   kwargs = { }
-  for arg in sys.argv[1:]:
-    if '=' in arg:
-      k, v = arg.split('=', 1)
-      kwargs[k] = v
+  kwargs['quiet'] = options.quiet
+
+  # Run server.
   bottle.run(host='localhost', port=8000, **kwargs)

@@ -21,7 +21,7 @@ PASTEE_URL = 'http://localhost:8000'
 
 def setup():
   global PASTEE_PROC
-  PASTEE_PROC = subprocess.Popen([PASTEE_PATH, 'quiet=True'])
+  PASTEE_PROC = subprocess.Popen([PASTEE_PATH, '--quiet'])
   print 'Pastee backend started; pid %d' % PASTEE_PROC.pid
   time.sleep(1)
 
