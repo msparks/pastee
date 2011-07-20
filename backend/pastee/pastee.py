@@ -27,6 +27,9 @@ DEFAULT_TTL = 86400 * 30  # 1 month
 TEST_MODE = False
 TEST_MODE_PREFIX = 'pastee:test'
 
+# Our child process pids.
+CHILDREN = []
+
 # Datastore instance.
 DS = datastore.Datastore()
 KEY_PREFIX = u'pastee'
@@ -188,21 +191,37 @@ def submit():
   return json.dumps(response)
 
 
-def shutdown_handler(signum, frame):
+def cleanup():
+  if not TEST_MODE:
+    print 'cleaning up'
+
+  # Kill children.
+  for pid in CHILDREN:
+    os.kill(pid, signal.SIGTERM)
+
+  # Clean up test mode keys.
   if TEST_MODE and DS.prefix() == TEST_MODE_PREFIX:
     keys = DS.keys()  # only keys starting with the testing prefix
     for key in keys:
       DS.delete(key)
 
 
-def main():
-  # Install signal handlers.
+def shutdown_handler(signum, frame):
+  if not TEST_MODE:
+    print 'caught signal %d; shutting down' % signum
+  cleanup()
+  sys.exit(0)
+
+
+def install_signal_handlers():
   signal.signal(signal.SIGBUS, shutdown_handler)
   signal.signal(signal.SIGINT, shutdown_handler)
   signal.signal(signal.SIGQUIT, shutdown_handler)
   signal.signal(signal.SIGSEGV, shutdown_handler)
   signal.signal(signal.SIGTERM, shutdown_handler)
 
+
+def main():
   # Option parser for commandline options.
   parser = optparse.OptionParser()
   parser.add_option('-d', '--debug', dest='debug',
@@ -210,6 +229,8 @@ def main():
                     help='Enable debug output')
   parser.add_option('-l', '--host', dest='host', default='localhost',
                     help='Listening server hostname')
+  parser.add_option('-c', '--children', type='int', dest='children', default=1,
+                    help='Number of child servers to fork')
   parser.add_option('-p', '--port', type='int', dest='port', default=8000,
                     help='Listening server port')
   parser.add_option('-q', '--quiet', dest='quiet',
@@ -241,15 +262,40 @@ def main():
   kwargs['host'] = options.host
   kwargs['port'] = options.port
 
-  # Run server.
-  try:
-    bottle.run(server='wsgiref', **kwargs)
-  except select.error, e:
-    num, msg = e
-    if num == 4:  # 'Interrupted system call'
-      pass
+  # Prefork and spawn multiple children to handle requests.
+  for i in range(options.children):
+    pid = os.fork()
+    if pid == 0:
+      # We're the child. Run the server.
+      try:
+        kwargs['port'] += i  # ports must be different for children
+        bottle.run(server='wsgiref', **kwargs)
+      except select.error, e:
+        num, msg = e
+        if num == 4:  # 'Interrupted system call'
+          pass
+        else:
+          raise
+
+      # Done.
+      sys.exit(0)
     else:
-      raise
+      # We're the parent.
+      global CHILDREN
+      CHILDREN.append(pid)
+
+  # Install signal handlers in the master process.
+  install_signal_handlers()
+
+  # Wait for children.
+  try:
+    os.wait()
+  except KeyboardInterrupt:
+    pass
+
+  # Cleanup and exit.
+  cleanup()
+  sys.exit(0)
 
 
 if __name__ == '__main__':
