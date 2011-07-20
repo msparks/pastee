@@ -226,6 +226,7 @@ def main():
     bottle.debug(True)
   if options.test:
     # Enable test mode.
+    global TEST_MODE
     TEST_MODE = True
     DS.prefix_is(TEST_MODE_PREFIX)
 
