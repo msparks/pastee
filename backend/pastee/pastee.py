@@ -19,9 +19,11 @@ import formatting
 import paste
 
 JSON_CONTENT_TYPE = 'application/json'
-MAX_LENGTH = 32 * 1024    # 32 KiB
-MAX_TTL = 86400 * 365     # 1 year
-DEFAULT_TTL = 86400 * 30  # 1 month
+
+# Settings and defaults.
+MAX_LENGTH = getattr(settings, 'MAX_LENGTH', 128)           # 128 KiB
+MAX_TTL = getattr(settings, 'MAX_TTL', 86400 * 365)         # 1 year
+DEFAULT_TTL = getattr(settings, 'DEFAULT_TTL', 86400 * 30)  # 1 month
 
 # Test mode: keys created with the test mode prefix are removed upon shutdown.
 TEST_MODE = False
@@ -169,7 +171,7 @@ def submit():
     err_msg = 'TTL out of range'
   elif len(lexer) > 30:
     err_msg = 'Invalid lexer'
-  elif len(content) > MAX_LENGTH:
+  elif len(content) > (MAX_LENGTH * 1024):  # KiB
     err_msg = 'Content too large'
 
   # Handle errors.
