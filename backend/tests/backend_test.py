@@ -130,3 +130,23 @@ class Test_Pastee:
     assert_true('id' in response_obj)
     assert_true('error' in response_obj)
     assert_equal(response_obj['id'], id)
+
+  def test_large_paste(self):
+    '''Check content size limits'''
+    limit = 128 * 1024  # 128 KiB
+
+    content = 'a' * limit
+    lexer_alias = 'text'
+    lexer_name = 'Text only'
+
+    # Create a submit request for 'just small enough' content.
+    data = {'content': content,
+            'lexer': lexer_alias}
+    response = self.request('submit', data=data)
+    response_obj = json.loads(response.read())
+    assert_true('id' in response_obj)  # successful paste
+
+    # Try again with one extra character (over the limit).
+    data = {'content': content + 'a',
+            'lexer': lexer_alias}
+    response = self.request('submit', data=data, expected_status=403)
