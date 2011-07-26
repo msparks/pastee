@@ -76,17 +76,39 @@ def validated_paste(ds, id):
   except KeyError:
     raise InvalidIDError
 
-  # No content is a sign of expiry.
+  # No content means the paste has already expired.
   if saved_paste.content() is None:
     raise InvalidIDError
 
-  # Check for TTL expiry.
-  # NOTE(ms): Lack of content should not be the only indicator of expiry, as
-  #   the deletion daemon might not have run yet for this paste.
+  # Check for TTL expiry. If content exists, the paste may be pending
+  # expiration.
   if saved_paste.created() + saved_paste.ttl() <= time.time():
+    # Paste is pending expiration (content needs to be deleted).
+    scrub_paste(saved_paste)
     raise InvalidIDError
 
   return saved_paste
+
+
+def scrub_paste(pst):
+  '''Removes all sensitive information from the paste, usually because the
+  paste expired.
+
+  Args:
+    pst: paste.Paste object to reap
+  '''
+  # If content doesn't exist, paste is already scrubbed.
+  if pst.content() is None:
+    return
+
+  # Remove content.
+  pst.content_is(None)
+
+  # Remove IP address.
+  pst.ip_address_is(None)
+
+  # Commit.
+  pst.save_state_is(paste.Paste.SaveStates.CLEAN)
 
 
 @bottle.route('/api/')
