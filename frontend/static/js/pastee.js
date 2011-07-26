@@ -237,12 +237,12 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
   // Set page title.
   $('title').html('Pastee: ' + data.id);
 
+  // Start with info bar buttons hidden.
+  $('.linkify').hide();
+  $('.wrap').hide();
+
   // Show info bar.
   displayInfoBar(_active_paste);
-
-  // Reset info bar buttons.
-  $('.linkify').show();
-  $('.wrap').show();
 
   // Show paste content.
   displayPaste(_active_paste);
@@ -269,27 +269,23 @@ function loadPasteSuccess(data, text_status, jq_xhr) {
 
   var wrap_mode = (toolong_ratio >= 0.5);
 
-  if (wrap_mode)
+  if (wrap_mode) {
     wrapMode();
-  else if (max_line_length > 82)
+    $('.wrap').show();
+  } else if (max_line_length > 82) {
     noWrapMode();
-  else
-    // Don't bother showing wrap button if all lines are short.
-    $('.wrap').hide();
+    $('.wrap').show();
+  }  // else: wrapmode button remains hidden
 
   // Determine if linkify mode should be enabled on this paste.
   var linkify_mode = false;
   if (linkify(data.html) != data.html)
     linkify_mode = true;
 
-  if (linkify_mode)
+  if (linkify_mode) {
     linkifyMode();
-  else
-    // No links were found anyway.
-    $('.linkify').hide();
-
-  // Show viewmode buttons after possibly hiding some of them.
-  $('.viewmodes').show();
+    $('.linkify').show();
+  }  // else: no links found; linkify button remains hidden
 }
 
 
