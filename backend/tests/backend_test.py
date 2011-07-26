@@ -150,3 +150,17 @@ class Test_Pastee:
     data = {'content': content + 'a',
             'lexer': lexer_alias}
     response = self.request('submit', data=data, expected_status=403)
+
+  def test_no_content(self):
+    '''Submit a paste with no content'''
+    # Try small content first.
+    data = {'content': 'x'}
+    response = self.request('submit', data=data, expected_status=200)
+
+    # Try empty content.
+    data = {'content': ''}
+    response = self.request('submit', data=data, expected_status=403)
+
+    # Try no content.
+    data = { }
+    response = self.request('submit', data=data, expected_status=403)
