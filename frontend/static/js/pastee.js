@@ -23,10 +23,11 @@ function init() {
   noWrapMode();
   noLinkifyMode();
 }
-$(init);
 
 
 // Re-initialize page state if the back button is clicked.
+// NOTE(ms): It seems that the popstate event is fired on page load. Thus, it
+// is not necessary to bind the init() to page load independently.
 $(window).bind('popstate', init);
 
 
