@@ -142,12 +142,12 @@ class Paste(object):
     # TODO(ms): Make this happen in one RTT when the datastore has support for
     # pipelining.
     unexpired_set_name = 'set:unexpired'
-    if self._expired():
+    if self.expired():
       self._ds.set_key_delete(unexpired_set_name, md_key)
     else:
       self._ds.set_key_is(unexpired_set_name, md_key)
 
-  def _expired(self):
+  def expired(self):
     '''Determine if this paste has expired.
 
     Returns:

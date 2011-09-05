@@ -92,6 +92,18 @@ class Test_Paste:
     creation_delta = time.time() - self._paste.created()
     assert_true(creation_delta < 3)
 
+  def test_expired(self):
+    '''Test expired()'''
+    created = self._paste.created()
+    self._paste.ttl_is(3600)
+    assert_false(self._paste.expired())
+
+    self._paste.ttl_is(0)
+    assert_true(self._paste.expired())
+
+    self._paste.ttl_is(1)
+    assert_false(self._paste.expired())
+
   def teardown(self):
     '''Clean up.'''
     keys = self._ds.keys()  # only keys starting with the testing prefix
