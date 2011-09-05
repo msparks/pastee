@@ -199,11 +199,14 @@ def submit():
 
 def cleanup():
   if not TEST_MODE:
-    logging.info('cleaning up')
+    logging.info('Cleaning up.')
 
   # Kill children.
   for pid in CHILDREN:
-    os.kill(pid, signal.SIGTERM)
+    try:
+      os.kill(pid, signal.SIGTERM)
+    except OSError:
+      pass  # it's okay if they're already dead
 
   # Clean up test mode keys.
   if TEST_MODE and DS.prefix() == TEST_MODE_PREFIX:
@@ -214,7 +217,7 @@ def cleanup():
 
 def shutdown_handler(signum, frame):
   if not TEST_MODE:
-    logging.info('caught signal %d; shutting down' % signum)
+    logging.info('Caught signal %d; shutting down.' % signum)
   cleanup()
   sys.exit(0)
 
@@ -316,6 +319,8 @@ def main():
     os.wait()
   except KeyboardInterrupt:
     pass
+  else:
+    logging.info('All children are dead.')
 
   # Cleanup and exit.
   cleanup()
