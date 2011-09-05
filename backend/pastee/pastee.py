@@ -17,6 +17,7 @@ import settings
 import datastore
 import formatting
 import paste
+import scrubber
 
 JSON_CONTENT_TYPE = 'application/json'
 
@@ -82,33 +83,13 @@ def validated_paste(ds, id):
 
   # Check for TTL expiry. If content exists, the paste may be pending
   # expiration.
-  if saved_paste.created() + saved_paste.ttl() <= time.time():
+  if saved_paste.expired():
     # Paste is pending expiration (content needs to be deleted).
-    scrub_paste(saved_paste)
+    scrubber_obj = scrubber.Scrubber(ds)
+    scrubber_obj.scrub(saved_paste)
     raise InvalidIDError
 
   return saved_paste
-
-
-def scrub_paste(pst):
-  '''Removes all sensitive information from the paste, usually because the
-  paste expired.
-
-  Args:
-    pst: paste.Paste object to reap
-  '''
-  # If content doesn't exist, paste is already scrubbed.
-  if pst.content() is None:
-    return
-
-  # Remove content.
-  pst.content_is(None)
-
-  # Remove IP address.
-  pst.ip_address_is(None)
-
-  # Commit.
-  pst.save_state_is(paste.Paste.SaveStates.CLEAN)
 
 
 @bottle.route('/api/')
