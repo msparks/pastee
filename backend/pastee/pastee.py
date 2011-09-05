@@ -274,7 +274,7 @@ def main():
       # We're the child. Run the server.
       try:
         kwargs['port'] += i  # ports must be different for children
-        bottle.run(server='wsgiref', **kwargs)
+        bottle.run(server='tornado', **kwargs)
       except select.error, e:
         num, msg = e
         if num == 4:  # 'Interrupted system call'
