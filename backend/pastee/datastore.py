@@ -146,7 +146,7 @@ class Datastore(object):
     Returns:
       True if successful
     '''
-    return self._conn.sadd(self._key(name), self._key(key))
+    return self._conn.sadd(self._key(name), key)
 
   def set_key_delete(self, name, key):
     '''Delete a key from a set.
@@ -158,7 +158,7 @@ class Datastore(object):
     Returns:
       True if successful
     '''
-    return self._conn.srem(self._key(name), self._key(key))
+    return self._conn.srem(self._key(name), key)
 
   def set_keys(self, name):
     '''Return all keys in a set.
@@ -171,7 +171,6 @@ class Datastore(object):
     '''
     keys = self._conn.smembers(self._key(name))
 
-    # Remove prefix from all keys.
-    prefix = self._key('')
-    keys = [x.decode('utf-8')[len(prefix):] for x in keys]
+    # Decode results.
+    keys = [x.decode('utf-8') for x in keys]
     return keys
