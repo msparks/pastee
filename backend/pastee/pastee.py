@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import json
+import logging
 import optparse
 import os
 import pprint
@@ -198,7 +199,7 @@ def submit():
 
 def cleanup():
   if not TEST_MODE:
-    print 'cleaning up'
+    logging.info('cleaning up')
 
   # Kill children.
   for pid in CHILDREN:
@@ -213,7 +214,7 @@ def cleanup():
 
 def shutdown_handler(signum, frame):
   if not TEST_MODE:
-    print 'caught signal %d; shutting down' % signum
+    logging.info('caught signal %d; shutting down' % signum)
   cleanup()
   sys.exit(0)
 
@@ -227,6 +228,11 @@ def install_signal_handlers():
 
 
 def main():
+  # Set up logging.
+  _fmt = '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+  logging.basicConfig(level=logging.INFO, format=_fmt)
+  root_logger = logging.getLogger()
+
   # Option parser for commandline options.
   parser = optparse.OptionParser()
   parser.add_option('-d', '--debug', dest='debug',
@@ -256,6 +262,7 @@ def main():
 
   # Adjust backend settings from options.
   if options.debug:
+    root_logger.setLevel(logging.DEBUG)
     bottle.debug(True)
   if options.test:
     # Enable test mode.
@@ -272,10 +279,11 @@ def main():
 
   # Fork to the background if --daemon is specified.
   if options.daemon:
+    root_logger.setLevel(logging.CRITICAL)
     pid = os.fork()
     if pid > 0:
       # We're the parent. Exit.
-      print 'Running in background.'
+      root_logger.info('Running in background.')
       sys.exit(0)
 
   # Prefork and spawn multiple children to handle requests.
