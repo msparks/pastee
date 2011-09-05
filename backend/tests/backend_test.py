@@ -17,12 +17,16 @@ PASTEE_PATH = os.path.join(os.path.dirname(__file__),
                            '..', 'pastee', 'pastee.py')
 
 # Localhost URL to backend.
-PASTEE_URL = 'http://localhost:8000'
+PASTEE_PORT = 23419  # random testing port
+PASTEE_URL = 'http://localhost:%d' % PASTEE_PORT
 
 
 def setup():
   global PASTEE_PROC
-  PASTEE_PROC = subprocess.Popen([PASTEE_PATH, '--quiet', '--test'])
+  PASTEE_PROC = subprocess.Popen([PASTEE_PATH,
+                                  '--quiet',
+                                  '--test',
+                                  '--port', str(PASTEE_PORT)])
   print 'Pastee backend started; pid %d' % PASTEE_PROC.pid
   time.sleep(1)
 
