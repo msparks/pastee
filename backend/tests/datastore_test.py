@@ -110,6 +110,40 @@ class Test_Datastore:
     assert_false(self._ds.exists(key_short))
     assert_true(self._ds.exists(key_long))
 
+  def test_sets(self):
+    '''Live test: set_*()'''
+    self._ds.prefix_is(self._testing_prefix)
+
+    # Name our new set.
+    name = 'myset'
+
+    # Set is initally empty.
+    assert_equal(len(self._ds.set_keys(name)), 0)
+
+    # Create a set.
+    name = 'myset'
+    keys = ('foo', 'bar', 'baz', 'quux', u'føø/bárkey')
+    for key in keys:
+      self._ds.set_key_is(name, key)
+
+    # Confirm size.
+    assert_equal(len(self._ds.set_keys(name)), len(keys))
+
+    # Confirm contents.
+    assert_equal(sorted(self._ds.set_keys(name)),
+                 sorted(keys))
+
+    # Delete incrementally.
+    remaining_keys = list(keys)
+    while len(remaining_keys) > 0:
+      # Remove head of list.
+      key = remaining_keys.pop(0)
+      self._ds.set_key_delete(name, key)
+
+      # Confirm the datastore is consistent with us.
+      assert_equal(sorted(self._ds.set_keys(name)),
+                   sorted(remaining_keys))
+
   def teardown(self):
     '''Clean up.'''
     # Set the prefix correctly, else we end up clearing the datastore entirely.

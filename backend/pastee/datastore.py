@@ -135,3 +135,43 @@ class Datastore(object):
       True if key exists
     '''
     return self._conn.exists(self._key(key))
+
+  def set_key_is(self, name, key):
+    '''Add a key to a set.
+
+    Args:
+      name: string name of set
+      key: string key to add to the set
+
+    Returns:
+      True if successful
+    '''
+    return self._conn.sadd(self._key(name), self._key(key))
+
+  def set_key_delete(self, name, key):
+    '''Delete a key from a set.
+
+    Args:
+      name: string name of set
+      key: string key to remove from the set.
+
+    Returns:
+      True if successful
+    '''
+    return self._conn.srem(self._key(name), self._key(key))
+
+  def set_keys(self, name):
+    '''Return all keys in a set.
+
+    Args:
+      name: string name of set
+
+    Returns:
+      list of keys
+    '''
+    keys = self._conn.smembers(self._key(name))
+
+    # Remove prefix from all keys.
+    prefix = self._key('')
+    keys = [x.decode('utf-8')[len(prefix):] for x in keys]
+    return keys
