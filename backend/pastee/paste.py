@@ -137,6 +137,26 @@ class Paste(object):
           'content': self._content}
     self._ds.value_is(md_key, json.dumps(md))
 
+    # Add or remove the paste from the 'unexpired' set. This set can be used to
+    # quickly find all active pastes.
+    # TODO(ms): Make this happen in one RTT when the datastore has support for
+    # pipelining.
+    unexpired_set_name = 'set:unexpired'
+    if self._expired():
+      self._ds.set_key_delete(unexpired_set_name, md_key)
+    else:
+      self._ds.set_key_is(unexpired_set_name, md_key)
+
+  def _expired(self):
+    '''Determine if this paste has expired.
+
+    Returns:
+      True if this paste is expired
+    '''
+    created = self._created or 0
+    ttl = self._ttl or 0
+    return (created + ttl <= time.time())
+
   def save_state(self):
     '''Returns the save state (e.g., clean or dirty).
 
