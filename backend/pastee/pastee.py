@@ -244,6 +244,9 @@ def main():
   parser.add_option('-r', '--reloader', dest='reloader',
                     action='store_true', default=False,
                     help='Turn on auto-reloader')
+  parser.add_option('--daemon', dest='daemon',
+                    action='store_true', default=False,
+                    help='Run in the background')
   parser.add_option('--test', dest='test',
                     action='store_true', default=False,
                     help='Test mode: created keys will be removed on shutdown')
@@ -266,6 +269,14 @@ def main():
   kwargs['reloader'] = options.reloader
   kwargs['host'] = options.host
   kwargs['port'] = options.port
+
+  # Fork to the background if --daemon is specified.
+  if options.daemon:
+    pid = os.fork()
+    if pid > 0:
+      # We're the parent. Exit.
+      print 'Running in background.'
+      sys.exit(0)
 
   # Prefork and spawn multiple children to handle requests.
   for i in range(options.children):
