@@ -232,6 +232,37 @@ def kill_pidfile(path):
   os.unlink(path)
 
 
+def kill_existing_instance(pidfile):
+  '''Sends a SIGTERM to an existing server instance.
+
+  This is a no-op if the pidfile does not exist.
+
+  Args:
+    pidfile: path to pidfile containing the pid
+
+  Raises:
+    IOError on open() or read() failure
+  '''
+  if not os.path.isfile(pidfile):
+    logging.info('pidfile does not exist. Assuming server is not running.')
+    return
+
+  fh = open(pidfile, 'r')
+  pid = fh.read()
+  fh.close()
+
+  pid = int(pid.strip())
+  logging.info('Sending TERM signal to pid %d' % pid)
+  os.kill(pid, signal.SIGTERM)
+
+  # Wait a second for the process to die to avoid a race on the pidfile. If we
+  # continue too fast, we will write our pid to the pidfile and the dying
+  # process will delete it. This also gives the other server a chance to clean
+  # up and release the server ports.
+  # TODO(ms): Is there something more reliable to use here?
+  time.sleep(1)
+
+
 def cleanup():
   if not TEST_MODE:
     logging.info('Cleaning up.')
@@ -300,12 +331,19 @@ def main():
                     help='Run in the background')
   parser.add_option('--pidfile', dest='pidfile', default=None,
                     help='Write main process pid to this path')
+  parser.add_option('--restart', dest='restart',
+                    action='store_true', default=False,
+                    help='(Re)start the server. Requires --pidfile')
   parser.add_option('--test', dest='test',
                     action='store_true', default=False,
                     help='Test mode: created keys will be removed on shutdown')
 
   # Parse commandline options.
   (options, args) = parser.parse_args()
+
+  # --restart requires --pidfile.
+  if options.restart and not options.pidfile:
+    parser.error('--restart option requires --pidfile')
 
   # Adjust backend settings from options.
   if options.debug:
@@ -323,6 +361,10 @@ def main():
   kwargs['reloader'] = options.reloader
   kwargs['host'] = options.host
   kwargs['port'] = options.port
+
+  # Kill existing instance if --restart was specified.
+  if options.restart:
+    kill_existing_instance(options.pidfile)
 
   # Write pidfile if requested.
   if options.pidfile is not None:
