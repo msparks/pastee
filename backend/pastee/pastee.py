@@ -228,6 +228,9 @@ def kill_pidfile(path):
   '''
   if path is None:
     return
+  if not os.path.exists(path):
+    logging.info('Pidfile does not exist; ignoring.')
+    return
   logging.debug('Removing pidfile')
   os.unlink(path)
 
