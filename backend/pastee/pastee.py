@@ -275,6 +275,45 @@ def kill_existing_instance(pidfile):
   time.sleep(1)
 
 
+def daemonize():
+  '''Fork into the background.
+
+  When this function returns, the process will be running in the background.
+
+  Raises:
+    OSError on any system call failure
+  '''
+  # This function is implemented based on the guidelines in "Advanced
+  # Programming in the Unix Environment", 2e, by W. Richard Stevens.
+  pid = os.fork()
+  if pid > 0:
+    # We're the parent. Exit.
+    # _exit() abruptly exits without calling cleanup routines. We will give
+    # this responsibility to the child.
+    os._exit(0)
+
+  # Child.
+  os.setsid()  # create new session; ditch controlling tty
+
+  # Find the maximum number of file descriptors.
+  import resource
+  maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+  if (maxfd == resource.RLIM_INFINITY):
+    maxfd = 1024
+
+  # Iterate through and close all file descriptors.
+  for fd in range(0, maxfd):
+    try:
+      os.close(fd)
+    except OSError:  # fd wasn't open to begin with (ignored)
+      pass
+
+  # Attach stdin (0), stdout (1) and stderr (2) to /dev/null.
+  os.open(os.devnull, os.O_RDWR)  # fd 0
+  os.dup2(0, 1)                   # fd 1 (stdout)
+  os.dup2(0, 2)                   # fd 2 (stderr)
+
+
 def cleanup_and_exit(code=0):
   '''Perform necessary cleanup tasks and exit.
 
@@ -346,7 +385,7 @@ def main():
   parser.add_option('-r', '--reloader', dest='reloader',
                     action='store_true', default=False,
                     help='Turn on auto-reloader')
-  parser.add_option('--daemon', dest='daemon',
+  parser.add_option('--daemonize', dest='daemonize',
                     action='store_true', default=False,
                     help='Run in the background')
   parser.add_option('--pidfile', dest='pidfile', default=None,
@@ -386,19 +425,10 @@ def main():
   if options.restart:
     kill_existing_instance(options.pidfile)
 
-  # Fork to the background if --daemon is specified.
-  root_logger.info('Daemonizing...')
-  if options.daemon:
-    root_logger.setLevel(logging.CRITICAL)
-    pid = os.fork()
-    if pid > 0:
-      # We're the parent. Exit.
-      # _exit() abruptly exits without calling cleanup routines. We will give
-      # this responsibility to the child.
-      os._exit(0)
-    else:
-      # Child.
-      os.setsid()  # create new session; ditch controlling tty
+  # Fork to the background if --daemonize is specified.
+  if options.daemonize:
+    root_logger.info('Daemonizing...')
+    daemonize()
 
   # Write pidfile if requested.
   if options.pidfile is not None:
