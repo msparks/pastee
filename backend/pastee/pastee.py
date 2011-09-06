@@ -393,7 +393,12 @@ def main():
     pid = os.fork()
     if pid > 0:
       # We're the parent. Exit.
-      sys.exit(0)
+      # _exit() abruptly exits without calling cleanup routines. We will give
+      # this responsibility to the child.
+      os._exit(0)
+    else:
+      # Child.
+      os.setsid()  # create new session; ditch controlling tty
 
   # Write pidfile if requested.
   if options.pidfile is not None:
