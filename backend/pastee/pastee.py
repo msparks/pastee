@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import errno
 import json
 import logging
 import optparse
@@ -245,6 +246,7 @@ def kill_existing_instance(pidfile):
 
   Raises:
     IOError on open() or read() failure
+    OSError on any other error except 'No such process'
   '''
   if not os.path.isfile(pidfile):
     logging.info('pidfile does not exist. Assuming server is not running.')
@@ -256,7 +258,14 @@ def kill_existing_instance(pidfile):
 
   pid = int(pid.strip())
   logging.info('Sending TERM signal to pid %d' % pid)
-  os.kill(pid, signal.SIGTERM)
+  try:
+    os.kill(pid, signal.SIGTERM)
+  except OSError, e:
+    if e.errno == errno.ESRCH:
+      logging.info('Pid %d is not alive; ignoring.' % pid)
+      return
+    else:
+      raise
 
   # Wait a second for the process to die to avoid a race on the pidfile. If we
   # continue too fast, we will write our pid to the pidfile and the dying
