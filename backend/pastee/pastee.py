@@ -387,12 +387,12 @@ def main():
     kill_existing_instance(options.pidfile)
 
   # Fork to the background if --daemon is specified.
+  root_logger.info('Daemonizing...')
   if options.daemon:
     root_logger.setLevel(logging.CRITICAL)
     pid = os.fork()
     if pid > 0:
       # We're the parent. Exit.
-      root_logger.info('Running in background.')
       sys.exit(0)
 
   # Write pidfile if requested.
