@@ -377,12 +377,6 @@ def main():
   if options.restart:
     kill_existing_instance(options.pidfile)
 
-  # Write pidfile if requested.
-  if options.pidfile is not None:
-    global PIDFILE
-    PIDFILE = options.pidfile
-    write_pidfile(PIDFILE)
-
   # Fork to the background if --daemon is specified.
   if options.daemon:
     root_logger.setLevel(logging.CRITICAL)
@@ -391,6 +385,12 @@ def main():
       # We're the parent. Exit.
       root_logger.info('Running in background.')
       sys.exit(0)
+
+  # Write pidfile if requested.
+  if options.pidfile is not None:
+    global PIDFILE
+    PIDFILE = options.pidfile
+    write_pidfile(PIDFILE)
 
   # Prefork and spawn multiple children to handle requests.
   for i in range(options.children):
