@@ -23,22 +23,31 @@ function init() {
   noWrapMode();
   noLinkifyMode();
 }
+// Call init() on page load.
+$(init);
 
 
 // Re-initialize page state if the back button is clicked.
-// NOTE(ms): It seems that the popstate event is fired on page load. Thus, it
-// is not necessary to bind the init() to page load independently.
-$(window).bind('popstate', init);
+// A workaround is required here because Chrome calls popstate on page load
+// whereas Firefox does not.
+$(window).bind('popstate', function (ev) {
+  if (!window.history.ready &&  // set this before each history.pushState
+      !ev.originalEvent.state)
+    return;  // workaround for popstate on load
+
+  init();
+});
 
 
 // Short-circuit 'new paste' link.
 $('a.new').unbind('click');
-$('a.new').click(function(e) {
+$('a.new').click(function (e) {
   // Browsers that support history modification can change the page state
   // without a refresh.
   if (window.history && history.pushState) {
     $('#_content').val('');  // clear only the content field
     showOnly('new');
+    window.history.ready = true;
     history.pushState(null, null, '/');
 
     // Stop propagation.
@@ -52,6 +61,7 @@ $('a.new').click(function(e) {
 // Redirects to 'url'. Employs deep magic to hide the referrer URL.
 function redirect(url) {
   if (window.history && history.replaceState) {
+    window.history.ready = true;
     history.replaceState(null, null, '/');
   }
   window.location.href = url;
@@ -181,6 +191,7 @@ $('.pastearea').blur(pasteAreaBlur);
 function pasteSuccess(data, text_status, jq_xhr) {
   // Update address bar with URL of paste.
   if (window.history && history.pushState) {
+    window.history.ready = true;
     history.pushState(null, null, data.id);
     loadPaste(data.id);
   } else {
