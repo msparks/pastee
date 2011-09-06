@@ -34,6 +34,9 @@ TEST_MODE_PREFIX = 'pastee:test'
 # Our child process pids.
 CHILDREN = []
 
+# Our pidfile.
+PIDFILE = None
+
 # Datastore instance.
 DS = datastore.Datastore()
 KEY_PREFIX = u'pastee'
@@ -197,6 +200,38 @@ def submit():
   return json.dumps(response)
 
 
+def write_pidfile(path):
+  '''Write this process's pid to a pidfile.
+
+  Args:
+    path: file path to write
+
+  Raises:
+    IOError on open() or write() failure
+  '''
+  if path is None:
+    return
+  logging.debug('Writing pidfile')
+  fh = open(path, 'w')
+  fh.write(str(os.getpid()))
+  fh.close()
+
+
+def kill_pidfile(path):
+  '''Removes a pidfile.
+
+  Args:
+    path: file path to delete
+
+  Raises:
+    OSError on failure
+  '''
+  if path is None:
+    return
+  logging.debug('Removing pidfile')
+  os.unlink(path)
+
+
 def cleanup():
   if not TEST_MODE:
     logging.info('Cleaning up.')
@@ -213,6 +248,13 @@ def cleanup():
     keys = DS.keys()  # only keys starting with the testing prefix
     for key in keys:
       DS.delete(key)
+
+  # Remove pidfile.
+  if PIDFILE is not None:
+    try:
+      kill_pidfile(PIDFILE)
+    except IOError, e:
+      logging.error('Error while deleting pidfile: %s' % e)
 
 
 def shutdown_handler(signum, frame):
@@ -256,6 +298,8 @@ def main():
   parser.add_option('--daemon', dest='daemon',
                     action='store_true', default=False,
                     help='Run in the background')
+  parser.add_option('--pidfile', dest='pidfile', default=None,
+                    help='Write main process pid to this path')
   parser.add_option('--test', dest='test',
                     action='store_true', default=False,
                     help='Test mode: created keys will be removed on shutdown')
@@ -279,6 +323,12 @@ def main():
   kwargs['reloader'] = options.reloader
   kwargs['host'] = options.host
   kwargs['port'] = options.port
+
+  # Write pidfile if requested.
+  if options.pidfile is not None:
+    global PIDFILE
+    PIDFILE = options.pidfile
+    write_pidfile(PIDFILE)
 
   # Fork to the background if --daemon is specified.
   if options.daemon:
