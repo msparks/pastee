@@ -396,6 +396,8 @@ def main():
   parser.add_option('--test', dest='test',
                     action='store_true', default=False,
                     help='Test mode: created keys will be removed on shutdown')
+  parser.add_option('--wsgi-server', dest='wsgi_server', default='wsgiref',
+                    help='WSGI server to use with the Bottle framework')
 
   # Parse commandline options.
   (options, args) = parser.parse_args()
@@ -443,7 +445,7 @@ def main():
       # We're the child. Run the server.
       try:
         kwargs['port'] += i  # ports must be different for children
-        bottle.run(server='tornado', **kwargs)
+        bottle.run(server=options.wsgi_server, **kwargs)
       except select.error, e:
         num, msg = e
         if num == 4:  # 'Interrupted system call'
