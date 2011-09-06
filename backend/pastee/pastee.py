@@ -266,7 +266,12 @@ def kill_existing_instance(pidfile):
   time.sleep(1)
 
 
-def cleanup():
+def cleanup_and_exit(code=0):
+  '''Perform necessary cleanup tasks and exit.
+
+  Args:
+    code: exit code
+  '''
   if not TEST_MODE:
     logging.info('Cleaning up.')
 
@@ -290,12 +295,15 @@ def cleanup():
     except IOError, e:
       logging.error('Error while deleting pidfile: %s' % e)
 
+  # Exit.
+  logging.info('Exiting.')
+  sys.exit(0)
+
 
 def shutdown_handler(signum, frame):
   if not TEST_MODE:
     logging.info('Caught signal %d; shutting down.' % signum)
-  cleanup()
-  sys.exit(0)
+  cleanup_and_exit()
 
 
 def install_signal_handlers():
@@ -418,8 +426,7 @@ def main():
     logging.info('All children are dead.')
 
   # Cleanup and exit.
-  cleanup()
-  sys.exit(0)
+  cleanup_and_exit()
 
 
 if __name__ == '__main__':
