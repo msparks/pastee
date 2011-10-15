@@ -19,7 +19,6 @@ import settings
 import datastore
 import formatting
 import paste
-import processutils
 import scrubber
 
 JSON_CONTENT_TYPE = 'application/json'
@@ -32,12 +31,6 @@ DEFAULT_TTL = getattr(settings, 'DEFAULT_TTL', 86400 * 30)  # 1 month
 # Test mode: keys created with the test mode prefix are removed upon shutdown.
 TEST_MODE = False
 TEST_MODE_PREFIX = 'pastee:test'
-
-# Our child process pids.
-CHILDREN = []
-
-# Our pidfile.
-PIDFILE = None
 
 # Datastore instance.
 DS = datastore.Datastore()
@@ -202,45 +195,6 @@ def submit():
   return json.dumps(response)
 
 
-def kill_existing_instance(pidfile):
-  '''Sends a SIGTERM to an existing server instance.
-
-  This is a no-op if the pidfile does not exist.
-
-  Args:
-    pidfile: path to pidfile containing the pid
-
-  Raises:
-    IOError on open() or read() failure
-    OSError on any other error except 'No such process'
-  '''
-  if not os.path.isfile(pidfile):
-    logging.info('pidfile does not exist. Assuming server is not running.')
-    return
-
-  fh = open(pidfile, 'r')
-  pid = fh.read()
-  fh.close()
-
-  pid = int(pid.strip())
-  logging.info('Sending TERM signal to pid %d' % pid)
-  try:
-    os.kill(pid, signal.SIGTERM)
-  except OSError, e:
-    if e.errno == errno.ESRCH:
-      logging.info('Pid %d is not alive; ignoring.' % pid)
-      return
-    else:
-      raise
-
-  # Wait a second for the process to die to avoid a race on the pidfile. If we
-  # continue too fast, we will write our pid to the pidfile and the dying
-  # process will delete it. This also gives the other server a chance to clean
-  # up and release the server ports.
-  # TODO(ms): Is there something more reliable to use here?
-  time.sleep(1)
-
-
 def cleanup_and_exit(code=0):
   '''Perform necessary cleanup tasks and exit.
 
@@ -250,25 +204,11 @@ def cleanup_and_exit(code=0):
   if not TEST_MODE:
     logging.info('Cleaning up.')
 
-  # Kill children.
-  for pid in CHILDREN:
-    try:
-      os.kill(pid, signal.SIGTERM)
-    except OSError:
-      pass  # it's okay if they're already dead
-
   # Clean up test mode keys.
   if TEST_MODE and DS.prefix() == TEST_MODE_PREFIX:
     keys = DS.keys()  # only keys starting with the testing prefix
     for key in keys:
       DS.delete(key)
-
-  # Remove pidfile.
-  if PIDFILE is not None:
-    try:
-      processutils.kill_pidfile(PIDFILE)
-    except IOError, e:
-      logging.error('Error while deleting pidfile: %s' % e)
 
   # Exit.
   logging.info('Exiting.')
@@ -302,8 +242,6 @@ def main():
                     help='Enable debug output')
   parser.add_option('-l', '--host', dest='host', default='localhost',
                     help='Listening server hostname')
-  parser.add_option('-c', '--children', type='int', dest='children', default=1,
-                    help='Number of child servers to fork')
   parser.add_option('-p', '--port', type='int', dest='port', default=8000,
                     help='Listening server port')
   parser.add_option('-q', '--quiet', dest='quiet',
@@ -312,14 +250,6 @@ def main():
   parser.add_option('-r', '--reloader', dest='reloader',
                     action='store_true', default=False,
                     help='Turn on auto-reloader')
-  parser.add_option('--daemonize', dest='daemonize',
-                    action='store_true', default=False,
-                    help='Run in the background')
-  parser.add_option('--pidfile', dest='pidfile', default=None,
-                    help='Write main process pid to this path')
-  parser.add_option('--restart', dest='restart',
-                    action='store_true', default=False,
-                    help='(Re)start the server. Requires --pidfile')
   parser.add_option('--test', dest='test',
                     action='store_true', default=False,
                     help='Test mode: created keys will be removed on shutdown')
@@ -328,10 +258,6 @@ def main():
 
   # Parse commandline options.
   (options, args) = parser.parse_args()
-
-  # --restart requires --pidfile.
-  if options.restart and not options.pidfile:
-    parser.error('--restart option requires --pidfile')
 
   # Adjust backend settings from options.
   if options.debug:
@@ -350,53 +276,19 @@ def main():
   kwargs['host'] = options.host
   kwargs['port'] = options.port
 
-  # Kill existing instance if --restart was specified.
-  if options.restart:
-    kill_existing_instance(options.pidfile)
-
-  # Fork to the background if --daemonize is specified.
-  if options.daemonize:
-    root_logger.info('Daemonizing...')
-    processutils.daemonize()
-
-  # Write pidfile if requested.
-  if options.pidfile is not None:
-    global PIDFILE
-    PIDFILE = options.pidfile
-    processutils.write_pidfile(PIDFILE)
-
-  # Prefork and spawn multiple children to handle requests.
-  for i in range(options.children):
-    pid = os.fork()
-    if pid == 0:
-      # We're the child. Run the server.
-      try:
-        kwargs['port'] += i  # ports must be different for children
-        bottle.run(server=options.wsgi_server, **kwargs)
-      except select.error, e:
-        num, msg = e
-        if num == 4:  # 'Interrupted system call'
-          pass
-        else:
-          raise
-
-      # Done.
-      sys.exit(0)
-    else:
-      # We're the parent.
-      global CHILDREN
-      CHILDREN.append(pid)
-
   # Install signal handlers in the master process.
   install_signal_handlers()
 
-  # Wait for children.
+  # Run the server.
   try:
-    os.wait()
-  except KeyboardInterrupt:
-    pass
-  else:
-    logging.info('All children are dead.')
+    bottle.run(server=options.wsgi_server, **kwargs)
+  except select.error, e:
+    num, msg = e
+    # TODO(ms): Magic number.
+    if num == 4:  # 'Interrupted system call'
+      pass
+    else:
+      raise
 
   # Cleanup and exit.
   cleanup_and_exit()
