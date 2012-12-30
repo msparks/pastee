@@ -29,5 +29,3 @@ export class PasteContainer {
 }
 
 }  // module paste
-
-//goog.exportSymbol('paste', paste);
