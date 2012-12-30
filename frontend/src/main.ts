@@ -1,5 +1,5 @@
-/// <reference path="third_party/sjcl.d.ts" />
 /// <reference path="paste.d.ts" />
+/// <reference path="third_party/sjcl.d.ts" />
 
 declare var goog;
 goog.require('paste');
