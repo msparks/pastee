@@ -21,18 +21,36 @@ class PasteContainerView extends Backbone.View {
 
   render() {
     console.log('PasteContainerView render()');
+    $('#viewpaste').show();
+
+    var is_encrypted: bool = this.model.get('paste_encrypted');
+    if (typeof is_encrypted !== 'undefined' &&
+        !is_encrypted) {
+      var p: paste.Paste = this.model.get('paste');
+      $('.viewpastebox').html(p.content);
+    } else {
+      console.log('encrypted or unknown');
+    }
+
     return this;
   }
 }
 
 export function main() {
+  var p = new paste.Paste();
+  p.content = 'foo';
+  p.lexer = 'text';
+
   var container = new paste.PasteContainer();
 
   var containerView = new PasteContainerView({
     model: container
   });
 
-  container.set('attribute', 'value');
+  container.set({
+    paste: p,
+    paste_encrypted: false
+  });
 }
 
 }  // module pastee
