@@ -287,6 +287,7 @@ div.pastebutton:hover {
 }
 
 .viewpastebox {
+  min-height: 200px;
   margin: 5px 10px 0 10px;
   overflow: auto;
 }
@@ -294,6 +295,14 @@ div.pastebutton:hover {
 .viewpastebox img {
   display: block;
   margin: 0 auto;
+}
+
+.viewpastebox pre {
+  min-height: inherit;
+}
+
+.viewpastebox pre code {
+  min-height: inherit;
 }
 
 /* Links left (new paste). */

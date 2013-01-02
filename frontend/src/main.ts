@@ -1,6 +1,7 @@
 /// <reference path="paste.d.ts" />
 /// <reference path="third_party/backbone.d.ts" />
 /// <reference path="third_party/closure.d.ts" />
+/// <reference path="third_party/hljs.d.ts" />
 /// <reference path="third_party/jquery.d.ts" />
 /// <reference path="third_party/sjcl.d.ts" />
 
@@ -27,7 +28,14 @@ class PasteContainerView extends Backbone.View {
     if (typeof is_encrypted !== 'undefined' &&
         !is_encrypted) {
       var p: paste.Paste = this.model.get('paste');
-      $('.viewpastebox').html(p.content);
+      console.log(p.content);
+      $('.viewpastebox pre code').html(p.content);
+      $('.viewpastebox pre code').each(function(i, e) {
+        hljs.highlightBlock(e, null, false);
+      });
+
+      var lexer: string = $('.viewpastebox pre code').attr('class');
+      console.log('lexer used: ' + lexer);
     } else {
       console.log('encrypted or unknown');
     }
@@ -38,7 +46,7 @@ class PasteContainerView extends Backbone.View {
 
 export function main() {
   var p = new paste.Paste();
-  p.content = 'foo';
+  p.content = "int main() {\n  printf(\"foo\\n\");\n  return 0;\n}";
   p.lexer = 'text';
 
   var container = new paste.PasteContainer();
