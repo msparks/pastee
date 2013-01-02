@@ -25,8 +25,11 @@ TSC_FLAGS = --declaration --sourcemap
 
 # JavaScript dependencies.
 JS_THIRD_PARTY_DEPS = \
+  src/third_party/backbone-min.js \
+  src/third_party/closure-library/closure/goog/base.js \
+  src/third_party/jquery-1.8.3.min.js \
   src/third_party/sjcl.js \
-  src/third_party/closure-library/closure/goog/base.js
+  src/third_party/underscore-min.js
 
 paste_SRC = $(BUILD_DIR)/src/paste.ts
 paste_OUT = $(BUILD_DIR)/js/app/paste.js

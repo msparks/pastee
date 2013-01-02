@@ -1,4 +1,6 @@
 /// <reference path="paste.d.ts" />
+/// <reference path="third_party/backbone.d.ts" />
+/// <reference path="third_party/jquery.d.ts" />
 /// <reference path="third_party/sjcl.d.ts" />
 
 declare var goog;
@@ -13,9 +15,6 @@ var kNumMillisPerSecond: number = 1000;
 module pastee {
 
 export function main() {
-  console.log('test');
-  alert('start');
-
   var p = new paste.Paste();
   p.content = 'foo bar this is a paste';
   p.lexer = 'text';
@@ -35,8 +34,6 @@ export function main() {
   pc.expiration_time = expiration_date.valueOf() / kNumMillisPerSecond;
 
   console.log(JSON.stringify(pc));
-
-  alert('foo');
 }
 
 }  // module pastee
