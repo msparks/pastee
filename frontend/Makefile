@@ -53,11 +53,11 @@ app_min_IDEPS = builddir
 
 $(paste_SRC): $(paste_IDEPS)
 $(paste_OUT): $(paste_SRC) $(paste_DEPS)
-	$(TSC) $(TSC_FLAGS) --out $@ $^
+	$(TSC) $(TSC_FLAGS) --out $@ $^ || (rm -f $@ && exit 1)
 
 $(main_SRC): $(paste_IDEPS)
 $(main_OUT): $(main_SRC) $(main_DEPS)
-	$(TSC) $(TSC_FLAGS) --out $@ $^
+	$(TSC) $(TSC_FLAGS) --out $@ $^ || (rm -f $@ && exit 1)
 
 $(app_min_OUT): $(app_min_SRC) $(app_min_DEPS) | $(app_min_IDEPS)
 	$(BUILDER) $(BUILDER_FLAGS) > $@

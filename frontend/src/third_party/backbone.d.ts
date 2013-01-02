@@ -3,7 +3,12 @@
 // needed.
 
 declare module Backbone {
+  export class Events {
+    listenTo(other: any, event: any, callback: () => any): void;
+  }
+
   export class Collection {
+    constructor(models?: any[], opts?: any);
     initialize(models?: any[], opts?: any);
 
     toJSON(): any;
@@ -22,6 +27,7 @@ declare module Backbone {
   }
 
   export class Model {
+    constructor(attributes?, options?);
     initialize(attributes?, options?);
 
     change(): void;
@@ -54,7 +60,8 @@ declare module Backbone {
     idAttribute: string;
   }
 
-  export class View {
+  export class View extends Events {
+    constructor(options?);
     initialize(options?);
 
     $(selector: string): any;

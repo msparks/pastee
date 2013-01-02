@@ -14,26 +14,25 @@ var kNumMillisPerSecond: number = 1000;
 
 module pastee {
 
+class PasteContainerView extends Backbone.View {
+  initialize() {
+    this.listenTo(this.model, 'change', this.render);
+  }
+
+  render() {
+    console.log('PasteContainerView render()');
+    return this;
+  }
+}
+
 export function main() {
-  var p = new paste.Paste();
-  p.content = 'foo bar this is a paste';
-  p.lexer = 'text';
+  var container = new paste.PasteContainer();
 
-  var password: string = 'password';
-  var cyphertext: string = sjcl.encrypt(password, JSON.stringify(p));
+  var containerView = new PasteContainerView({
+    model: container
+  });
 
-  var pc = new paste.PasteContainer();
-  pc.paste = JSON.parse(cyphertext);
-  pc.paste_encrypted = true;
-
-  var now = new Date();
-  pc.creation_time = now.valueOf() / kNumMillisPerSecond;
-
-  var ttl_days: number = 30;
-  var expiration_date = new Date(now.valueOf() + ttl_days * kNumSecondsPerDay);
-  pc.expiration_time = expiration_date.valueOf() / kNumMillisPerSecond;
-
-  console.log(JSON.stringify(pc));
+  container.set('attribute', 'value');
 }
 
 }  // module pastee
