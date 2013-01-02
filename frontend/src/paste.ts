@@ -1,4 +1,4 @@
-declare var goog;
+/// <reference path="third_party/closure.d.ts" />
 
 goog.provide('paste');
 

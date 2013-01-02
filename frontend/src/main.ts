@@ -1,9 +1,9 @@
 /// <reference path="paste.d.ts" />
 /// <reference path="third_party/backbone.d.ts" />
+/// <reference path="third_party/closure.d.ts" />
 /// <reference path="third_party/jquery.d.ts" />
 /// <reference path="third_party/sjcl.d.ts" />
 
-declare var goog;
 goog.require('paste');
 
 goog.provide('pastee.main');
