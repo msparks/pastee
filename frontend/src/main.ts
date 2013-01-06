@@ -10,10 +10,35 @@ goog.require('paste');
 goog.provide('pastee.main');
 
 // Approximate number of seconds in one Earth day.
-var kNumSecondsPerDay: number = 86400;
-var kNumMillisPerSecond: number = 1000;
+var kNumSecondsPerDay: number = 86400.0;
+
+var kNumSecondsPerHour: number = 3600.0;
+var kNumMillisPerSecond: number = 1000.0;
 
 module pastee {
+
+class TimeToLiveView extends Backbone.View {
+  initialize() {
+    this.listenTo(this.model, 'change:expiration_time', this.render);
+  }
+
+  render() {
+    console.log('TimeToLiveView render()');
+
+    // Epoch when the paste expires.
+    var expirationTime: number = this.model.get('expiration_time');
+    // Seconds since the Unix epoch.
+    var nowEpoch: number = (new Date()).valueOf() / kNumMillisPerSecond;
+    // Time to live in days.
+    // TODO(ms): Break down by hour/minute/second.
+    var ttlDays: number = (expirationTime - nowEpoch) / kNumSecondsPerDay;
+
+    // TODO(ms): Need better formatting.
+    $('.viewttl').html(Math.round(ttlDays * 1000) / 1000 + ' days');
+
+    return this;
+  }
+}
 
 class PasteContainerView extends Backbone.View {
   initialize() {
@@ -28,7 +53,9 @@ class PasteContainerView extends Backbone.View {
     if (typeof is_encrypted !== 'undefined' &&
         !is_encrypted) {
       var p: paste.Paste = this.model.get('paste');
-      console.log(p.content);
+
+      $('.viewid').html(this.model.get('id'));
+      $('.viewinfo').show();
       $('.viewpastebox pre code').html(p.content);
       $('.viewpastebox pre code').each(function(i, e) {
         hljs.highlightBlock(e, null, false);
@@ -54,10 +81,15 @@ export function main() {
   var containerView = new PasteContainerView({
     model: container
   });
+  var timeToLiveView = new TimeToLiveView({
+    model: container
+  });
 
   container.set({
+    id: '39rzrv',
     paste: p,
-    paste_encrypted: false
+    paste_encrypted: false,
+    expiration_time: 1420542903
   });
 }
 
