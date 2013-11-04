@@ -1,0 +1,10 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#edit {
+  font-family: 'Bitstream Vera Sans Mono', Monaco, Consolas, 'Courier New', monospace;
+  height: 100vh;
+  padding: 0.5em;
+}

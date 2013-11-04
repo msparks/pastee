@@ -1,5 +1,6 @@
 import 'dart:html';
 
 void main() {
-  print('Hello from Dart.');
+  print('Pastee loaded.');
+  query('#edit').focus();
 }
