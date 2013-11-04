@@ -5,5 +5,7 @@ void main() {
   initPolymer();
 
   print('Pastee loaded.');
-  //query('#edit').focus();
+  var paste = query('paste-element');
+  paste.focus();
+  paste.editableIs(true);
 }
