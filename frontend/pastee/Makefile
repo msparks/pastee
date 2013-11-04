@@ -1,16 +1,26 @@
-DART2JS = dart2js
+DART = dart
+PUB = pub
 
 ifeq ($(DEBUG), 1)
   FLAGS += -c
 endif
 
-BINARIES = pastee.dart.js
+out: build.dart
+	$(DART) build.dart
 
-%.dart.js: %.dart
-	$(DART2JS) $(FLAGS) -o$@ $<
+out/pubspec.yaml: pubspec.yaml
+	ln -s ../$< out/$<
 
+.PHONY: build
+build:
+	$(PUB) build
+
+serve: out out/pubspec.yaml
+	cd out && $(PUB) serve
+
+.PHONY: clean
 clean:
-	rm -f *.dart.*
+	rm -rf out build
 
-all: $(BINARIES)
-.DEFAULT_GOAL := $(BINARIES)
+all: build
+.DEFAULT_GOAL := all
