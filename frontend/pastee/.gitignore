@@ -1,0 +1,4 @@
+packages
+pubspec.lock
+*.dart.js*
+*.dart.precompiled.js
