@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<polymer-element name="paste-element">
+  <template>
+    <style>
+      textarea#content {
+        border: 0;
+        box-sizing: border-box;
+        font-family: 'Bitstream Vera Sans Mono', Monaco, Consolas, 'Courier New', monospace;
+        font-size: 16px;
+        height: 100vh;
+        width: 100vw;
+        outline: none;
+        padding: 0.5em;
+        position: absolute;
+        z-index: -1;
+      }
+    </style>
+
+    <div><textarea id="content"></textarea></div>
+  </template>
+
+  <script type="application/dart" src="paste_element.dart"></script>
+</polymer-template>

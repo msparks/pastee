@@ -1,10 +1,9 @@
-import 'dart:html';
+library paste_element;
+
 import 'package:polymer/polymer.dart';
 
 @CustomTag('paste-element')
 class PasteElement extends PolymerElement {
-  @observable String content = '';
-
   PasteElement.created() : super.created();
 
   void editableIs(bool value) {
@@ -14,5 +13,9 @@ class PasteElement extends PolymerElement {
 
   void focus() {
     $['content'].focus();
+  }
+
+  String get content {
+    return $['content'].value;
   }
 }

@@ -6,8 +6,8 @@
 #save {
   position: relative;
   float: right;
-  top: 2em;
-  left: -2em;
+  top: 1em;
+  left: -1em;
 
   background-color: #0e83cd;
   border: 3px solid white;
@@ -21,6 +21,8 @@
   letter-spacing: 1px;
   line-height: 24px;
   min-width: 260px;
+  opacity: 0.9;
+  outline: 0;
   text-transform: uppercase;
   transition-delay: 0;
   transition-duration: 0.3s;
