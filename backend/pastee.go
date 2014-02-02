@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-type PasteCreationReq struct {
+type PastesPostReq struct {
 	Content string
 	Mac     string
 	Expiry  string
 }
 
-type PasteCreationResp struct {
+type PastesPostResp struct {
 	Id string `json:"id"`
 }
 
@@ -26,8 +26,8 @@ type Paste struct {
 
 func init() {
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/pastes", pastesPostHandler)
 	http.HandleFunc("/pastes/", pastesGetHandler)
+	http.HandleFunc("/pastes", pastesPostHandler)
 }
 
 func indexHandler(w http.ResponseWriter, request *http.Request) {
@@ -35,58 +35,57 @@ func indexHandler(w http.ResponseWriter, request *http.Request) {
 }
 
 // Handles GET requests to /pastes/{id}.
-func pastesGetHandler(w http.ResponseWriter, request *http.Request) {
-	if request.Method != "GET" {
+func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Extract id from URL.
-	id := strings.Replace(request.URL.Path, "/pastes/", "", -1)
+	id := strings.Replace(r.URL.Path, "/pastes/", "", -1)
 
 	fmt.Fprintf(w, "%v", id)
 }
 
-func pastesPostHandler(w http.ResponseWriter, request *http.Request) {
-	if request.Method != "POST" {
+func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	const kMaxContentLength = 256 * 1024
-	if request.ContentLength > kMaxContentLength {
+	if r.ContentLength > kMaxContentLength {
 		w.WriteHeader(http.StatusRequestEntityTooLarge)
 		return
 	}
-	if request.ContentLength < 0 {
+	if r.ContentLength < 0 {
 		w.WriteHeader(http.StatusLengthRequired)
 		return
 	}
 
-	postData := make([]byte, request.ContentLength)
-	_, err := request.Body.Read(postData)
+	postData := make([]byte, r.ContentLength)
+	_, err := r.Body.Read(postData)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "paste must contain a body")
+		fmt.Fprintf(w, "POST body required")
 		return
 	}
 
-	creationRequest, err := pasteCreationRequestFromPostData(postData)
+	var request PastesPostReq
+	err = json.Unmarshal(postData, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "%v\n", err)
 		return
 	}
 
-	responseBytes, err := json.Marshal(PasteCreationResp{Id: "foo"})
-	fmt.Fprintf(w, "request: %+v\n", creationRequest)
+	code, response, _ := pastesPostRPC(&request)
+	responseBytes, err := json.Marshal(response)
+	w.WriteHeader(code)
+	fmt.Fprintf(w, "request: %+v\n", request)
 	fmt.Fprintf(w, "response: %+v\n", string(responseBytes))
 }
 
-func pasteCreationRequestFromPostData(postData []byte) (PasteCreationReq, error) {
-	var creationRequest PasteCreationReq
-	if err := json.Unmarshal(postData, &creationRequest); err != nil {
-		return creationRequest, err
-	}
-	return creationRequest, nil
+func pastesPostRPC(req *PastesPostReq) (int, PastesPostResp, error) {
+	return http.StatusCreated, PastesPostResp{Id: "foo"}, nil
 }
