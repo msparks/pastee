@@ -55,8 +55,9 @@ func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
 	mb31IDString := strings.Replace(r.URL.Path, "/pastes/", "", -1)
 
 	// Decode MBase31 ID.
+	// The zeroth ID is special and is considered invalid.
 	mb31ID, err := MBase31FromString(mb31IDString)
-	if err != nil {
+	if err != nil || mb31ID.Value == 0 {
 		// All parse result in a 404.
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -70,6 +71,7 @@ func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Convert Paste to a PasteGetResp.
 	response := PastesGetResp{}
 	response.Content = paste.Content
 	response.Mac = paste.Mac
