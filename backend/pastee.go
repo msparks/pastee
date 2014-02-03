@@ -4,8 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 	"time"
+
+	"appengine"
+	"appengine/datastore"
 )
 
 type PastesPostReq struct {
@@ -19,9 +24,9 @@ type PastesPostResp struct {
 }
 
 type Paste struct {
-	content string
-	mac     string
-	expiry  time.Time
+	Content string
+	Mac     string
+	Expiry  time.Time
 }
 
 func init() {
@@ -53,8 +58,8 @@ func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const kMaxContentLength = 256 * 1024
-	if r.ContentLength > kMaxContentLength {
+	const kMaxBodyLength = 256 * 1024
+	if r.ContentLength > kMaxBodyLength {
 		w.WriteHeader(http.StatusRequestEntityTooLarge)
 		return
 	}
@@ -79,13 +84,55 @@ func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, response, _ := pastesPostRPC(&request)
-	responseBytes, err := json.Marshal(response)
+	ctx := appengine.NewContext(r)
+	code, response, err := pastesPostRPC(&ctx, &request)
 	w.WriteHeader(code)
+	if err != nil {
+		fmt.Fprintf(w, "error: %+v\n", err)
+	}
+
+	responseBytes, err := json.Marshal(response)
 	fmt.Fprintf(w, "request: %+v\n", request)
 	fmt.Fprintf(w, "response: %+v\n", string(responseBytes))
 }
 
-func pastesPostRPC(req *PastesPostReq) (int, PastesPostResp, error) {
-	return http.StatusCreated, PastesPostResp{Id: "foo"}, nil
+func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesPostResp, error) {
+	// TODO(ms): These should be configurable.
+	const kMaxContentLength = 256 * 1024 // 256 KiB
+	const kMaxMacLength = 128
+
+	// TODO(ms): Populate error messages.
+	// Content is required.
+	if request.Content == "" {
+		return http.StatusBadRequest, PastesPostResp{}, nil
+	} else if len(request.Content) > kMaxContentLength {
+		return http.StatusBadRequest, PastesPostResp{}, nil
+	} else if len(request.Mac) > kMaxMacLength {
+		return http.StatusBadRequest, PastesPostResp{}, nil
+	}
+
+	// TODO(ms): Handle expiry date from request.
+	now := time.Now()
+	var lifetime time.Duration = 24 * time.Hour
+
+	// Contstruct Paste entity for datastore.
+	var paste Paste
+	paste.Content = request.Content
+	paste.Mac = request.Mac
+	paste.Expiry = now.Add(lifetime)
+
+	fmt.Fprintf(os.Stderr, "Paste: %+v\n", paste)
+
+	key, err := datastore.Put(*ctx, datastore.NewIncompleteKey(*ctx, "paste", nil),
+		&paste)
+	if err != nil {
+		return http.StatusInternalServerError, PastesPostResp{}, err
+	}
+
+	fmt.Fprintf(os.Stderr, "Key: %+v; ID: %d\n", *key, key.IntID())
+
+	var response PastesPostResp
+	response.Id = strconv.FormatInt(key.IntID(), 10)
+
+	return http.StatusCreated, response, nil
 }
