@@ -134,8 +134,6 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 	paste.Mac = request.Mac
 	paste.Expiry = expiry
 
-	fmt.Fprintf(os.Stderr, "Paste: %+v\n", paste)
-
 	// Insert Paste.
 	key, err := datastore.Put(
 		*ctx, datastore.NewIncompleteKey(*ctx, "paste", nil), &paste)
