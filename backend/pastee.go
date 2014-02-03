@@ -5,13 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"appengine"
 	"appengine/datastore"
 )
+
+type PastesGetResp struct {
+	Content string `json:"content"`
+	Mac     string `json:"mac"`
+	Expiry  string `json:"expiry"`
+}
 
 type PastesPostReq struct {
 	Content string
@@ -46,10 +51,32 @@ func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extract id from URL.
-	id := strings.Replace(r.URL.Path, "/pastes/", "", -1)
+	// Extract MBase31 ID from URL.
+	mb31IDString := strings.Replace(r.URL.Path, "/pastes/", "", -1)
 
-	fmt.Fprintf(w, "%v", id)
+	// Decode MBase31 ID.
+	mb31ID, err := MBase31FromString(mb31IDString)
+	if err != nil {
+		// All parse result in a 404.
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	ctx := appengine.NewContext(r)
+	key := datastore.NewKey(ctx, "paste", "", mb31ID.Value, nil)
+	var paste Paste
+	if err := datastore.Get(ctx, key, &paste); err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	response := PastesGetResp{}
+	response.Content = paste.Content
+	response.Mac = paste.Mac
+	response.Expiry = paste.Expiry.Format(time.RFC3339)
+
+	responseBytes, _ := json.Marshal(response)
+	fmt.Fprintf(w, "%v\n", string(responseBytes))
 }
 
 func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,8 +119,7 @@ func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseBytes, err := json.Marshal(response)
-	fmt.Fprintf(w, "request: %+v\n", request)
-	fmt.Fprintf(w, "response: %+v\n", string(responseBytes))
+	fmt.Fprintf(w, "%v\n", string(responseBytes))
 }
 
 func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesPostResp, error) {
