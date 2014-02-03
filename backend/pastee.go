@@ -2,6 +2,7 @@ package pastee
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -99,6 +100,7 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 	// TODO(ms): These should be configurable.
 	const kMaxContentLength = 256 * 1024 // 256 KiB
 	const kMaxMacLength = 128
+	const kMaxLifetime = 7 * 24 * time.Hour
 
 	// TODO(ms): Populate error messages.
 	// Content is required.
@@ -110,25 +112,34 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 		return http.StatusBadRequest, PastesPostResp{}, nil
 	}
 
-	// TODO(ms): Handle expiry date from request.
+	// Parse and validate expiration date.
+	var expiry time.Time
+	if request.Expiry != "" {
+		var err error
+		expiry, err = time.Parse(time.RFC3339, request.Expiry)
+		if err != nil {
+			return http.StatusBadRequest, PastesPostResp{}, errors.New("bad time format")
+		}
+	}
 	now := time.Now()
-	var lifetime time.Duration = 24 * time.Hour
+	if expiry.After(now.Add(kMaxLifetime)) {
+		return http.StatusBadRequest, PastesPostResp{}, errors.New(
+			fmt.Sprintf("maximum lifetime is %v", kMaxLifetime))
+	}
 
 	// Contstruct Paste entity for datastore.
 	var paste Paste
 	paste.Content = request.Content
 	paste.Mac = request.Mac
-	paste.Expiry = now.Add(lifetime)
+	paste.Expiry = expiry
 
 	fmt.Fprintf(os.Stderr, "Paste: %+v\n", paste)
 
-	key, err := datastore.Put(*ctx, datastore.NewIncompleteKey(*ctx, "paste", nil),
-		&paste)
+	key, err := datastore.Put(
+		*ctx, datastore.NewIncompleteKey(*ctx, "paste", nil), &paste)
 	if err != nil {
 		return http.StatusInternalServerError, PastesPostResp{}, err
 	}
-
-	fmt.Fprintf(os.Stderr, "Key: %+v; ID: %d\n", *key, key.IntID())
 
 	var response PastesPostResp
 	response.Id = MBase31{Value: key.IntID()}.ToString()
