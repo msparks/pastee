@@ -102,14 +102,15 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 	const kMaxMacLength = 128
 	const kMaxLifetime = 7 * 24 * time.Hour
 
-	// TODO(ms): Populate error messages.
-	// Content is required.
+	// Length checking.
 	if request.Content == "" {
-		return http.StatusBadRequest, PastesPostResp{}, nil
+		return http.StatusBadRequest, PastesPostResp{}, errors.New("content is required")
 	} else if len(request.Content) > kMaxContentLength {
-		return http.StatusBadRequest, PastesPostResp{}, nil
+		return http.StatusBadRequest, PastesPostResp{}, errors.New(
+			fmt.Sprintf("max content is %d bytes", kMaxContentLength))
 	} else if len(request.Mac) > kMaxMacLength {
-		return http.StatusBadRequest, PastesPostResp{}, nil
+		return http.StatusBadRequest, PastesPostResp{}, errors.New(
+			fmt.Sprintf("max mac length is %d bytes", kMaxMacLength))
 	}
 
 	// Parse and validate expiration date.
@@ -127,7 +128,7 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 			fmt.Sprintf("maximum lifetime is %v", kMaxLifetime))
 	}
 
-	// Contstruct Paste entity for datastore.
+	// Construct Paste entity for datastore.
 	var paste Paste
 	paste.Content = request.Content
 	paste.Mac = request.Mac
@@ -135,14 +136,15 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 
 	fmt.Fprintf(os.Stderr, "Paste: %+v\n", paste)
 
+	// Insert Paste.
 	key, err := datastore.Put(
 		*ctx, datastore.NewIncompleteKey(*ctx, "paste", nil), &paste)
 	if err != nil {
 		return http.StatusInternalServerError, PastesPostResp{}, err
 	}
 
+	// Paste created successfully.
 	var response PastesPostResp
 	response.Id = MBase31{Value: key.IntID()}.ToString()
-
 	return http.StatusCreated, response, nil
 }
