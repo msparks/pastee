@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -132,7 +131,7 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 	fmt.Fprintf(os.Stderr, "Key: %+v; ID: %d\n", *key, key.IntID())
 
 	var response PastesPostResp
-	response.Id = strconv.FormatInt(key.IntID(), 10)
+	response.Id = MBase31{Value: key.IntID()}.ToString()
 
 	return http.StatusCreated, response, nil
 }
