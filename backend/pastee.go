@@ -107,27 +107,33 @@ func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	const kMaxBodyLength = 256 * 1024
 	if r.ContentLength > kMaxBodyLength {
-		w.WriteHeader(http.StatusRequestEntityTooLarge)
+		respondWithError(
+			http.StatusRequestEntityTooLarge,
+			ErrorResp{Error: "body too large"}, w)
 		return
 	}
 	if r.ContentLength < 0 {
-		w.WriteHeader(http.StatusLengthRequired)
+		respondWithError(
+			http.StatusLengthRequired,
+			ErrorResp{Error: "content length required"}, w)
 		return
 	}
 
 	postData := make([]byte, r.ContentLength)
 	_, err := r.Body.Read(postData)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "POST body required")
+		respondWithError(
+			http.StatusBadRequest,
+			ErrorResp{Error: "POST body required"}, w)
 		return
 	}
 
 	var request PastesPostReq
 	err = json.Unmarshal(postData, &request)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "%v\n", err)
+		respondWithError(
+			http.StatusBadRequest,
+			ErrorResp{Error: err.Error()}, w)
 		return
 	}
 
@@ -136,12 +142,11 @@ func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(code)
 	var responseBytes []byte
 	if err != nil {
-		errorResponse := ErrorResp{Error: err.Error()}
-		responseBytes, _ = json.Marshal(errorResponse)
+		respondWithError(code, ErrorResp{Error: err.Error()}, w)
 	} else {
 		responseBytes, _ = json.Marshal(response)
+		fmt.Fprintf(w, "%v\n", string(responseBytes))
 	}
-	fmt.Fprintf(w, "%v\n", string(responseBytes))
 }
 
 func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesPostResp, error) {
