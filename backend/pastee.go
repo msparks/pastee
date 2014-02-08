@@ -129,6 +129,7 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 	const kMaxContentLength = 256 * 1024 // 256 KiB
 	const kMaxMacLength = 128
 	const kMaxLifetime = 7 * 24 * time.Hour
+	const kDefaultLifetime = 1 * time.Hour
 
 	// Length checking.
 	if request.Content == "" {
@@ -142,6 +143,7 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 	}
 
 	// Parse and validate expiration date.
+	now := time.Now()
 	var expiry time.Time
 	if request.Expiry != "" {
 		var err error
@@ -149,11 +151,13 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 		if err != nil {
 			return http.StatusBadRequest, PastesPostResp{}, errors.New("bad time format")
 		}
-	}
-	now := time.Now()
-	if expiry.After(now.Add(kMaxLifetime)) {
-		return http.StatusBadRequest, PastesPostResp{}, errors.New(
-			fmt.Sprintf("maximum lifetime is %v", kMaxLifetime))
+
+		if expiry.After(now.Add(kMaxLifetime)) {
+			return http.StatusBadRequest, PastesPostResp{}, errors.New(
+				fmt.Sprintf("maximum lifetime is %v", kMaxLifetime))
+		}
+	} else {
+		expiry = now.Add(kDefaultLifetime)
 	}
 
 	// Construct Paste entity for datastore.
