@@ -49,6 +49,12 @@ func indexHandler(w http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(w, "Index handler")
 }
 
+func respondWithError(code int, response ErrorResp, w http.ResponseWriter) {
+	w.WriteHeader(code)
+	responseBytes, _ := json.Marshal(response)
+	fmt.Fprintf(w, "%v\n", string(responseBytes))
+}
+
 // Handles GET requests to /pastes/{id}.
 func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -63,8 +69,8 @@ func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
 	// The zeroth ID is special and is considered invalid.
 	mb31ID, err := MBase31FromString(mb31IDString)
 	if err != nil || mb31ID.Value == 0 {
-		// All parse result in a 404.
-		w.WriteHeader(http.StatusNotFound)
+		// All parse errors result in a 404.
+		respondWithError(http.StatusNotFound, ErrorResp{Error: "not found"}, w)
 		return
 	}
 
@@ -72,14 +78,14 @@ func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
 	key := datastore.NewKey(ctx, "paste", "", mb31ID.Value, nil)
 	var paste Paste
 	if err := datastore.Get(ctx, key, &paste); err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		respondWithError(http.StatusNotFound, ErrorResp{Error: "not found"}, w)
 		return
 	}
 
 	// Has the Paste expired?
 	now := time.Now()
 	if paste.Expiry.Before(now) {
-		w.WriteHeader(http.StatusNotFound)
+		respondWithError(http.StatusNotFound, ErrorResp{Error: "not found"}, w)
 		return
 	}
 
