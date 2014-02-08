@@ -35,6 +35,10 @@ type Paste struct {
 	Expiry  time.Time
 }
 
+type ErrorResp struct {
+	Error string `json:"error"`
+}
+
 func init() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/pastes/", pastesGetHandler)
@@ -117,12 +121,14 @@ func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	code, response, err := pastesPostRPC(&ctx, &request)
 	w.WriteHeader(code)
+	var responseBytes []byte
 	if err != nil {
-		fmt.Fprintf(w, "error: %+v\n", err)
+		errorResponse := ErrorResp{Error: err.Error()}
+		responseBytes, _ = json.Marshal(errorResponse)
 	} else {
-		responseBytes, err := json.Marshal(response)
-		fmt.Fprintf(w, "%v\n", string(responseBytes))
+		responseBytes, _ = json.Marshal(response)
 	}
+	fmt.Fprintf(w, "%v\n", string(responseBytes))
 }
 
 func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesPostResp, error) {
