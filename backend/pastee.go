@@ -119,10 +119,10 @@ func pastesPostHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(code)
 	if err != nil {
 		fmt.Fprintf(w, "error: %+v\n", err)
+	} else {
+		responseBytes, err := json.Marshal(response)
+		fmt.Fprintf(w, "%v\n", string(responseBytes))
 	}
-
-	responseBytes, err := json.Marshal(response)
-	fmt.Fprintf(w, "%v\n", string(responseBytes))
 }
 
 func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesPostResp, error) {
