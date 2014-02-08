@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -140,6 +141,12 @@ func pastesPostRPC(ctx *appengine.Context, request *PastesPostReq) (int, PastesP
 	} else if len(request.Mac) > kMaxMacLength {
 		return http.StatusBadRequest, PastesPostResp{}, errors.New(
 			fmt.Sprintf("max mac length is %d bytes", kMaxMacLength))
+	}
+
+	// Verify MAC looks lke a hex digest.
+	if m, _ := regexp.MatchString("^[a-f0-9]*$", request.Mac); !m {
+		return http.StatusBadRequest, PastesPostResp{}, errors.New(
+			fmt.Sprintf("mac must be a hex digest"))
 	}
 
 	// Parse and validate expiration date.
