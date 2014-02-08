@@ -76,6 +76,13 @@ func pastesGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Has the Paste expired?
+	now := time.Now()
+	if paste.Expiry.Before(now) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	// Convert Paste to a PasteGetResp.
 	response := PastesGetResp{}
 	response.Content = paste.Content
